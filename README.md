@@ -1,4 +1,115 @@
-# React + TypeScript + Vite
+# NutriMap
+
+A React + TypeScript application for managing nutrition campaigns and volunteer coordination built with Vite.
+
+## Features
+
+- 🔐 Multi-role authentication (Volunteers, Organizations, Admins)
+- 📊 Campaign management and tracking
+- 🗺️ Interactive mapping with Leaflet
+- 👥 Volunteer application system
+- 📱 Responsive Material-UI interface
+
+## Tech Stack
+
+- **Frontend**: React 19, TypeScript, Material-UI
+- **Routing**: React Router v7
+- **Maps**: Leaflet & React-Leaflet
+- **HTTP Client**: Axios
+- **Build Tool**: Vite
+- **Testing**: Vitest + React Testing Library
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Testing
+
+This project includes comprehensive test coverage using Vitest and React Testing Library.
+
+### Run Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm test -- --watch
+
+# Run tests with UI
+npm run test:ui
+
+# Generate coverage report
+npm run test:coverage
+```
+
+For detailed testing documentation, see [TESTING.md](./TESTING.md)
+
+### Test Coverage
+
+- ✅ Authentication & Authorization
+- ✅ Campaign Management Services
+- ✅ User & Application Services
+- ✅ Protected Routes & Role-Based Access
+- ✅ Component Rendering & Interactions
+- ✅ TypeScript Interface Validation
+
+## Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm test` - Run tests
+- `npm run test:ui` - Run tests with UI
+- `npm run test:coverage` - Generate coverage report
+
+## Project Structure
+
+```
+NutriMap/
+├── src/
+│   ├── components/       # Reusable UI components
+│   ├── pages/           # Page components
+│   ├── services/        # API and business logic
+│   ├── interfaces/      # TypeScript interfaces
+│   ├── assets/          # Static assets
+│   ├── App.tsx          # Main app component
+│   └── main.tsx         # Entry point
+├── public/              # Public assets
+└── tests/              # Test files (co-located with source)
+```
+
+## Development
+
+### Code Style
+
+This project uses ESLint for code quality. Run linting with:
+
+```bash
+npm run lint
+```
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
