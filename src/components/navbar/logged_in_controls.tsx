@@ -1,10 +1,10 @@
-import {ChatOutlined, LogoutOutlined, MenuOutlined, PersonOutlined} from "@mui/icons-material";
+import {LogoutOutlined, MenuOutlined, PersonOutlined} from "@mui/icons-material";
 import {Box, Button, IconButton, Menu, MenuItem, Typography} from "@mui/material";
 import {useContext, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {useAuth} from "../../services/auth_service.tsx";
 import {mobile_context} from "../../main.tsx";
 import {PATHS, USER_TYPES} from "../../PATHS.ts";
+import {useAuth} from "../../services/auth_service.tsx";
 import theme from "../../theme.ts";
 
 interface Props {
@@ -56,10 +56,6 @@ function LoggedInControls({user_name}: Props) {
                             }
                         </Typography>
                     </MenuItem>
-                    <MenuItem onClick={() => {handleClose(); navigate(`/${PATHS.MESSAGES}`)}}> 
-                        <ChatOutlined />
-                        Messages
-                    </MenuItem>
                     <MenuItem onClick={() => {handleClose(); handleLogout()}}>
                         <LogoutOutlined />
                         Log Out
@@ -79,13 +75,6 @@ function LoggedInControls({user_name}: Props) {
                         : user_name
                     }
                 </Typography>
-                <Button
-                    disableElevation
-                    endIcon={<ChatOutlined />}
-                    onClick={() => navigate(`/${PATHS.MESSAGES}`)}
-                >
-                    Messages
-                </Button>
                 <Button
                     disableElevation
                     endIcon={<LogoutOutlined />}
