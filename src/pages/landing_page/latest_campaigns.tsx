@@ -24,7 +24,9 @@ function LatestCampaigns() {
     // ARRAY OF CAMPAIGN CARDS
     if (!ids) return null
     const campaigns = ids.map((id) => (
-        <CampaignCard key={id} id={id} hide_status={true} hide_button={true} />
+        <Box key={id} sx={{ flex: '1 1 0', minWidth: 0, display: 'flex' }}>
+            <CampaignCard id={id} hide_status={true} hide_button={true} />
+        </Box>
     ))
 
     return (
@@ -32,6 +34,7 @@ function LatestCampaigns() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'stretch',
             gap: 2,
         }}>
             <Typography variant={'h3'}>Latest Campaigns</Typography>
@@ -41,7 +44,9 @@ function LatestCampaigns() {
                     display: 'flex',
                     flexDirection: 'row',
                     gap: 2,
-                    px: '2.5%'
+                    px: '2.5%',
+                    width: '100%',
+                    alignItems: 'stretch'
                 }}>
                     {campaigns}
                 </Box>

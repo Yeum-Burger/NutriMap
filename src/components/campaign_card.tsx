@@ -81,7 +81,11 @@ function CampaignCard({id, hide_button, hide_org, hide_location, hide_date, hide
     return (
         <Card sx={{
             m: 1,
-            p: 1
+            p: 1,
+            flexGrow: 1,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column'
         }}>
             <CardHeader title={campaign.name} />
             <CardContent sx={{
@@ -89,6 +93,7 @@ function CampaignCard({id, hide_button, hide_org, hide_location, hide_date, hide
                 flexDirection: "column",
                 gap: 2,
                 minHeight: 'fit-content',
+                flexGrow: 1
             }}>
                 {/* CAMPAIGN DETAILS */}
                 <Box sx={{
@@ -130,7 +135,7 @@ function CampaignCard({id, hide_button, hide_org, hide_location, hide_date, hide
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
                                 WebkitLineClamp: 3
-                }}>
+                            }}>
                     {campaign.description}
                 </Typography>
             </CardContent>
@@ -144,7 +149,7 @@ function CampaignCard({id, hide_button, hide_org, hide_location, hide_date, hide
                         sx={{
                             display: !hide_button ? "flex" : "none",
                             gap: 1
-                }}>
+                        }}>
                     <RemoveRedEyeOutlined />
                     View
                 </Button>
