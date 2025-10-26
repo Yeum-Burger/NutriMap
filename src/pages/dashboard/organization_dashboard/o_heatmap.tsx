@@ -4,16 +4,14 @@ import { useEffect, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type {BarangayRiskData} from "../../../interfaces/interfaces.ts";
-import {mockBarangayRiskData, mockBarangayRiskData6Months, mockBarangayRiskData12Months} from '../../../interfaces/mock_data.ts'
+import { getRiskDataByTimePeriod, type TimePeriod } from '../../../services/risk_data_service.ts'
 import barangaysData from '../../../assets/Barangays.json'
-
-type TimePeriod = 'current' | '6months' | '12months'
 
 function O_Heatmap() {
     const [geojsonData, setGeojsonData] = useState<any>(null)
     const [mapKey, setMapKey] = useState(0)
     const [timePeriod, setTimePeriod] = useState<TimePeriod>('current')
-    const [riskData, setRiskData] = useState<BarangayRiskData[]>(mockBarangayRiskData)
+    const [riskData, setRiskData] = useState<BarangayRiskData[]>(getRiskDataByTimePeriod('current'))
     
     useEffect(() => {
         try {
@@ -29,17 +27,7 @@ function O_Heatmap() {
     }, [])
 
     useEffect(() => {
-        switch (timePeriod) {
-            case 'current':
-                setRiskData(mockBarangayRiskData)
-                break
-            case '6months':
-                setRiskData(mockBarangayRiskData6Months)
-                break
-            case '12months':
-                setRiskData(mockBarangayRiskData12Months)
-                break
-        }
+        setRiskData(getRiskDataByTimePeriod(timePeriod))
         setMapKey(prev => prev + 1)
     }, [timePeriod])
 

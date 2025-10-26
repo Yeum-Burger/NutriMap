@@ -19,6 +19,9 @@ import DashboardOutlet from "./pages/dashboard/dashboard_outlet.tsx";
 import OrganizationDashboard from "./pages/dashboard/organization_dashboard/o_dashboard.tsx";
 import VolunteerDashboard from "./pages/dashboard/volunteer_dashboard/v_dashboard.tsx";
 import LandingPage from "./pages/landing_page/landing_page.tsx";
+import TermsOfService from "./pages/terms-of-service.tsx";
+import PrivacyStatement from "./pages/privacy-statement.tsx";
+import LegalNotice from "./pages/legal-notice.tsx";
 import {PATHS, USER_TYPES} from "./PATHS.ts";
 import {AuthProvider, useAuth} from "./services/auth_service.tsx";
 
@@ -37,6 +40,9 @@ function AppRoutes() {
                 <Routes>
                     {/* Public Routes */}
                     <Route path={PATHS.HOME} element={<LandingPage />} />
+                    <Route path="/terms-of-service" element={<TermsOfService />} />
+                    <Route path="/privacy-statement" element={<PrivacyStatement />} />
+                    <Route path="/legal-notice" element={<LegalNotice />} />
 
                     {/* Auth Routes */}
                     <Route path={PATHS.LOGIN} element={
