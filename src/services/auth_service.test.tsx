@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
-import { AuthProvider, useAuth } from './auth_service'
-import type { LogInFormData } from '../interfaces/interfaces'
-import { USER_TYPES } from '../PATHS'
+import {renderHook, waitFor} from '@testing-library/react'
+import {beforeEach, describe, expect, it} from 'vitest'
+import type {LogInFormData} from '../interfaces/interfaces'
+import {USER_TYPES} from '../PATHS'
+import {AuthProvider, useAuth} from './auth_service'
 
 describe('AuthService', () => {
   beforeEach(() => {

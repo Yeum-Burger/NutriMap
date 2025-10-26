@@ -1,7 +1,7 @@
-import { ReactElement } from 'react'
-import { render, RenderOptions } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { AuthProvider } from './services/auth_service'
+import {render, type RenderOptions} from '@testing-library/react'
+import {type ReactElement} from 'react'
+import {MemoryRouter} from 'react-router-dom'
+import {AuthProvider} from './services/auth_service'
 
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   initialEntries?: string[]

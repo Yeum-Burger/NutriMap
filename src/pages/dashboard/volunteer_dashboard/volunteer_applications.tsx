@@ -2,7 +2,7 @@ import {Box, List, Paper, Typography} from "@mui/material"
 import {useContext, useEffect, useState} from "react";
 import ApplicationCard from "../../../components/application_card.tsx";
 import Carousel from "../../../components/carousel.tsx";
-import {mobile_context} from "../../../main.tsx";
+import {mobile_context} from "../../../mobile_context.ts";
 import {useAuth} from "../../../services/auth_service.tsx";
 import {getApplicationIDs} from "../../../services/volunteer_application_service.ts";
 

@@ -10,7 +10,10 @@ const TITLE_MAP: Record<string, string> = {
     'volunteer-applications': 'Volunteer Applications',
     'settings': 'Settings',
     'profile': 'Profile',
-    'dashboard': 'Dashboard'
+    'dashboard': 'Dashboard',
+    'a-campaign-manager': 'Campaign Manager',
+    'a-org-manager': 'Campaign Manager',
+
 };
 
 function DashboardOutlet() {

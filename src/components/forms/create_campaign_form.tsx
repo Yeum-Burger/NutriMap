@@ -16,6 +16,8 @@ interface FormErrors {
     date?: string;
     description?: string;
     task?: string;
+    task_quota?: string;
+    task_desc?: string;
 }
 
 function CreateCampaignForm() {
@@ -42,40 +44,42 @@ function CreateCampaignForm() {
         }));
     };
 
+    const handleAddTaskClick = () => {
+        const trimmedName = taskInput.trim();
+        const trimmedQuota = taskQuota.trim();
+        const trimmedDescription = taskDescription.trim();
+
+        if (!trimmedName || !trimmedQuota || !trimmedDescription) {
+            setErrors(prev => ({
+                ...prev,
+                task: "Task name, quota, and description are required",
+            }));
+            return;
+        }
+
+        const newTask: TaskDraft = {
+            name: trimmedName,
+            quota: trimmedQuota,
+            description: trimmedDescription,
+        };
+
+        setFormData(prev => ({
+            ...prev,
+            task: [...prev.task, newTask],
+        }));
+
+        setTaskInput("");
+        setTaskQuota("");
+        setTaskDescription("");
+        setErrors(prev => ({ ...prev, task: undefined }));
+    };
+
     const handleAddTask = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
             e.preventDefault();
-
-            const trimmedName = taskInput.trim();
-            const trimmedQuota = taskQuota.trim();
-            const trimmedDescription = taskDescription.trim();
-
-            if (!trimmedName || !trimmedQuota || !trimmedDescription) {
-                setErrors(prev => ({
-                    ...prev,
-                    task: "Task name, quota, and description are required",
-                }));
-                return;
-            }
-
-            const newTask: TaskDraft = {
-                name: trimmedName,
-                quota: trimmedQuota,
-                description: trimmedDescription,
-            };
-
-            setFormData(prev => ({
-                ...prev,
-                task: [...prev.task, newTask],
-            }));
-
-            setTaskInput("");
-            setTaskQuota("");
-            setTaskDescription("");
-            setErrors(prev => ({ ...prev, task: undefined }));
+            handleAddTaskClick();
         }
     };
-
 
     const handleDeleteTask = (taskToDelete: TaskDraft) => {
         setFormData(prev => ({
@@ -186,33 +190,48 @@ function CreateCampaignForm() {
                         }}
                         onKeyDown={handleAddTask}
                         disabled={!taskInputEnabled}
-                        helperText="Press Enter to add task"
                         error={!!errors.task}
                     />
                     <TextField
                         label="Task Quota"
                         value={taskQuota}
                         onChange={e => {
-                            setTaskInput(e.target.value);
-                            if (errors.task) setErrors(prev => ({ ...prev, task: undefined }));
+                            const value = e.target.value;
+                            if (value === '' || /^[0-9]\d*$/.test(value)) {
+                                setTaskQuota(value);
+                            }
+                            if (errors.task_quota) setErrors(prev => ({ ...prev, task_quota: undefined }));
                         }}
                         onKeyDown={handleAddTask}
                         disabled={!taskInputEnabled}
-                        helperText="Press Enter to add task"
-                        error={!!errors.task}
+                        error={!!errors.task_quota}
                     />
                     <TextField
                         label="Task Description"
                         value={taskDescription}
                         onChange={e => {
-                            setTaskInput(e.target.value);
-                            if (errors.task) setErrors(prev => ({ ...prev, task: undefined }));
+                            setTaskDescription(e.target.value);
+                            if (errors.task_desc) setErrors(prev => ({ ...prev, task_desc: undefined }));
                         }}
                         onKeyDown={handleAddTask}
                         disabled={!taskInputEnabled}
-                        helperText="Press Enter to add task"
-                        error={!!errors.task}
+                        error={!!errors.task_desc}
                     />
+
+                    <Button
+                        variant="outlined"
+                        onClick={handleAddTaskClick}
+                        disabled={!taskInputEnabled}
+                        fullWidth
+                    >
+                        Add Task
+                    </Button>
+
+                    {errors.task && (
+                        <Box sx={{ color: 'error.main', fontSize: '0.75rem', mt: -1 }}>
+                            {errors.task}
+                        </Box>
+                    )}
 
                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                         {form_data.task.map((task, index) => (

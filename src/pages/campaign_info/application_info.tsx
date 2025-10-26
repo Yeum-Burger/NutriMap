@@ -1,10 +1,10 @@
 import {CalendarTodayOutlined, CorporateFareOutlined, LocationOnOutlined, WorkOutlineOutlined} from "@mui/icons-material";
-import {Box, Typography, Chip, Button} from "@mui/material"
+import {Box, Typography, Chip} from "@mui/material"
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import type {Application, Campaign, CampaignTask} from "../../interfaces/interfaces.ts";
 import {getCampaignByID} from "../../services/campaign_service.ts";
-import {getApplicationByID, getTaskByID, updateApplicationStatus} from "../../services/volunteer_application_service.ts";
+import {getApplicationByID, getTaskByID} from "../../services/volunteer_application_service.ts";
 import theme from "../../theme.ts";
 
 function ApplicationInfo() {
@@ -13,7 +13,6 @@ function ApplicationInfo() {
     const [task, setTask] = useState<CampaignTask | null>(null)
     const [campaign, setCampaign] = useState<Campaign | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
-    const [updating, setUpdating] = useState<boolean>(false)
 
     console.log(id)
 
@@ -37,30 +36,6 @@ function ApplicationInfo() {
 
         get_application_details();
     }, [id]);
-
-    const handleApprove = async () => {
-        setUpdating(true)
-        try {
-            await updateApplicationStatus(id, 'approved')
-            setApplication(prev => prev ? {...prev, status: 'approved'} : prev)
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setUpdating(false)
-        }
-    }
-
-    const handleReject = async () => {
-        setUpdating(true)
-        try {
-            await updateApplicationStatus(id, 'rejected')
-            setApplication(prev => prev ? {...prev, status: 'rejected'} : prev)
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setUpdating(false)
-        }
-    }
 
     const chip_color = () => {
         if (application?.status === 'approved')
@@ -124,33 +99,6 @@ function ApplicationInfo() {
                     color: theme.palette.primary.contrastText,
                 }}/>
             </Box>
-
-            {application?.status === 'pending' && (
-                <Box sx={{
-                    display: 'flex',
-                    gap: 2,
-                    mt: 2
-                }}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleApprove}
-                        disabled={updating}
-                        fullWidth
-                    >
-                        Approve Application
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={handleReject}
-                        disabled={updating}
-                        fullWidth
-                    >
-                        Reject Application
-                    </Button>
-                </Box>
-            )}
         </Box>
     )
 }

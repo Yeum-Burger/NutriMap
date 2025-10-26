@@ -1,32 +1,66 @@
-import {Box, List} from "@mui/material"
+import {Box, List, Typography} from "@mui/material"
 import {useEffect, useState} from "react";
 import CampaignCard from "../../components/campaign_card.tsx";
-import {getCampaignIDs} from "../../services/campaign_service.ts";
+import {getCampaignByID, getCampaignIDs} from "../../services/campaign_service.ts";
 
 function A_CampaignManager() {
-    const [ids, setIds] = useState<string[] | null>(null)
+    const [sortedIds, setSortedIds] = useState<string[] | null>(null)
+    const [loading, setLoading] = useState<boolean>(true)
 
     useEffect(() => {
-        async function get_campaign_ids() {
+        async function get_and_sort_campaigns() {
             try {
                 const response = await getCampaignIDs();
-                setIds(response.data);
+                const ids = response.data;
+
+                // Fetch all campaign details
+                const campaignPromises = ids.map(id => getCampaignByID(id));
+                const campaigns = await Promise.all(campaignPromises);
+
+                // Sort campaigns: pending first, then others
+                const sorted = campaigns
+                    .map(c => c.data)
+                    .sort((a, b) => {
+                        if (a.status === 'pending' && b.status !== 'pending') return -1;
+                        if (a.status !== 'pending' && b.status === 'pending') return 1;
+                        // Optional: further sort by date within same status
+                        return new Date(b.date).getTime() - new Date(a.date).getTime();
+                    })
+                    .map(c => c.id);
+
+                setSortedIds(sorted);
             } catch (error) {
                 console.log(error);
+            } finally {
+                setLoading(false);
             }
         }
 
-        get_campaign_ids();
+        get_and_sort_campaigns();
     }, []);
 
-    if (!ids) return null
-    const campaign = ids.map((id) => (
+    if (loading) {
+        return (
+            <Box sx={{ p: 2 }}>
+                <Typography>Loading campaigns...</Typography>
+            </Box>
+        )
+    }
+
+    if (!sortedIds || sortedIds.length === 0) {
+        return (
+            <Box sx={{ p: 2 }}>
+                <Typography>No campaigns found</Typography>
+            </Box>
+        )
+    }
+
+    const campaign = sortedIds.map((id) => (
         <CampaignCard key={id} id={id} hide_description={true} hide_org={true}/>
     ))
-    return (
-        <Box sx={{
 
-        }}>
+    return (
+        <Box>
             <List>
                 {campaign}
             </List>

@@ -1,6 +1,6 @@
 import {Box} from "@mui/material"
 import {useContext} from "react";
-import {mobile_context} from "../../../main.tsx";
+import {mobile_context} from "../../../mobile_context.ts";
 import O_Heatmap from "./o_heatmap.tsx";
 import OrganizationTools from "./o_tools.tsx";
 

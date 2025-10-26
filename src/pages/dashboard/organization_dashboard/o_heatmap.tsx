@@ -114,10 +114,10 @@ function O_Heatmap() {
                         Current
                     </ToggleButton>
                     <ToggleButton value="6months" aria-label="6 months">
-                        6 Months Ago
+                        In 6 Months
                     </ToggleButton>
                     <ToggleButton value="12months" aria-label="12 months">
-                        12 Months Ago
+                        In 12 Months
                     </ToggleButton>
                 </ToggleButtonGroup>
             </Box>

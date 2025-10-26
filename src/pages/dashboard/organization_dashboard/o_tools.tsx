@@ -2,7 +2,7 @@ import {Paper, Typography, Box, Button} from "@mui/material"
 import {useContext, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import CampaignCard from "../../../components/campaign_card.tsx";
-import {mobile_context} from "../../../main.tsx";
+import {mobile_context} from "../../../mobile_context.ts";
 import {PATHS} from "../../../PATHS.ts";
 import {useAuth} from "../../../services/auth_service.tsx";
 import {getCampaignIDs} from "../../../services/campaign_service.ts";
