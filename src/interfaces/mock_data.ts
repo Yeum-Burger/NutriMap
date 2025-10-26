@@ -3,15 +3,22 @@ import {
     type Organization,
     type Campaign,
     type Application,
-    type BarangayRiskData, type User, type Conversation, type Message
+    type BarangayRiskData, type User
 } from "./interfaces.ts";
 export const mockAdmin: User[] = [{
-    id: "vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d21w4eg6",
-    email: "jhn.do@example.com",
+    id: "3",
+    email: "admin@nutrimap.com",
     password: "password123",
 }]
 // -------------------- Volunteers --------------------
 export const mockVolunteers: Volunteer[] = [
+    {
+        id: "1",
+        email: "test.volunteer@example.com",
+        password: "password123",
+        first_name: "Test",
+        last_name: "Volunteer",
+    },
     {
         id: "vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d2c1e9a7",
         email: "john.doe@example.com",
@@ -37,6 +44,14 @@ export const mockVolunteers: Volunteer[] = [
 
 // -------------------- Organizations --------------------
 export const mockOrganizations: Organization[] = [
+    {
+        id: "2",
+        email: "contact@foodbank.org",
+        password: "password123",
+        organization_name: "Test Food Bank",
+        address: "123 Test Street, Test City, Philippines",
+        status: "pending",
+    },
     {
         id: "org-1a45e3b9-56d8-40c3-9e2f-2d8c1fefb512",
         email: "greenearth@example.org",
@@ -66,10 +81,29 @@ export const mockOrganizations: Organization[] = [
 // -------------------- Campaigns --------------------
 export const mockCampaigns: Campaign[] = [
     {
+        id: "1",
+        name: "Food Distribution Drive",
+        organization_name: "Test Food Bank",
+        organization_id: "2",
+        location: "Test City",
+        date: new Date("2025-11-10"),
+        description: "A test campaign for food distribution.",
+        status: "approved",
+        task: [
+            {
+                id: "1",
+                campaign_id: "1",
+                quota: "10",
+                name: "Food Packing",
+                description: "Help pack food for distribution.",
+            },
+        ],
+    },
+    {
         id: "a1f0e1d2-4c5b-11ef-8c2b-0242ac120001",
         name: "Clean Water Drive",
         organization_name: "AquaAid Foundation",
-        organization_id: "org-1a45e3b9-56d8-40c3-9e2f-2d8c1fefb512", // ✅ add this
+        organization_id: "org-1a45e3b9-56d8-40c3-9e2f-2d8c1fefb512",
         location: "Cebu City",
         date: new Date("2025-11-10"),
         description: "A campaign to provide clean water to remote communities.",
@@ -183,6 +217,12 @@ export const mockCampaigns: Campaign[] = [
     },
 ];
 export const mockApplications: Application[] = [
+    {
+        id: "1",
+        c_task_id: "1",
+        user_id: "1",
+        status: "approved",
+    },
     {
         id: "app-001",
         c_task_id: "task-001",
@@ -325,204 +365,4 @@ export const mockBarangayRiskData12Months: BarangayRiskData[] = [
     { id: '071222028', name: 'Balugo', risk_score: 47, severity: 'LOW' },
     { id: '071222029', name: 'Banilad', risk_score: 54, severity: 'MEDIUM' },
     { id: '071222030', name: 'Tubtubon', risk_score: 49, severity: 'LOW' },
-];
-
-// -------------------- Mock Messaging Data --------------------
-/**
- * Mock conversations for testing
- * Demonstrates different conversation types:
- * - Volunteer <-> Admin
- * - Volunteer <-> Organization
- * - Organization <-> Admin
- */
-export const mockConversations: Conversation[] = [
-    // Volunteer (John Doe) <-> Admin conversation
-    {
-        id: 'conv-001',
-        participant_1_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d2c1e9a7', // John Doe (Volunteer)
-        participant_2_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d21w4eg6', // Admin
-        last_message: 'Thank you for your help!',
-        last_message_time: new Date('2025-10-24T14:30:00'),
-        unread_count: 0,
-    },
-    // Volunteer (John Doe) <-> Organization (Green Earth) conversation
-    {
-        id: 'conv-002',
-        participant_1_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d2c1e9a7', // John Doe (Volunteer)
-        participant_2_id: 'org-1a45e3b9-56d8-40c3-9e2f-2d8c1fefb512', // Green Earth Foundation
-        last_message: 'When does the tree planting start?',
-        last_message_time: new Date('2025-10-25T10:15:00'),
-        unread_count: 1,
-    },
-    // Volunteer (Jane Smith) <-> Organization (Helping Hands) conversation
-    {
-        id: 'conv-003',
-        participant_1_id: 'vol-82a9a1c4-5f23-4c7d-91f8-c4f1b1a93f56', // Jane Smith (Volunteer)
-        participant_2_id: 'org-72e91a6d-0d58-4a7a-87f4-27fbb70db71f', // Helping Hands PH
-        last_message: 'I can help with the food distribution.',
-        last_message_time: new Date('2025-10-23T16:45:00'),
-        unread_count: 0,
-    },
-    // Organization (Green Earth) <-> Admin conversation
-    {
-        id: 'conv-004',
-        participant_1_id: 'org-1a45e3b9-56d8-40c3-9e2f-2d8c1fefb512', // Green Earth Foundation
-        participant_2_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d21w4eg6', // Admin
-        last_message: 'Campaign approval status update',
-        last_message_time: new Date('2025-10-25T09:00:00'),
-        unread_count: 2,
-    },
-    // Volunteer (Mark Tan) <-> Admin conversation
-    {
-        id: 'conv-005',
-        participant_1_id: 'vol-cb62e5c9-2f76-44b3-8c27-748dca6a924e', // Mark Tan (Volunteer)
-        participant_2_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d21w4eg6', // Admin
-        last_message: 'How do I update my profile?',
-        last_message_time: new Date('2025-10-22T11:20:00'),
-        unread_count: 0,
-    },
-];
-
-/**
- * Mock messages for testing
- * Contains sample messages for different conversations
- */
-export const mockMessages: Message[] = [
-    // Messages for conv-001 (John Doe <-> Admin)
-    {
-        id: 'msg-001',
-        conversation_id: 'conv-001',
-        sender_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d2c1e9a7', // John Doe
-        content: 'Hello, I need help with my application.',
-        timestamp: new Date('2025-10-24T14:00:00'),
-        is_read: true,
-    },
-    {
-        id: 'msg-002',
-        conversation_id: 'conv-001',
-        sender_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d21w4eg6', // Admin
-        content: 'Hello John! How can I assist you today?',
-        timestamp: new Date('2025-10-24T14:05:00'),
-        is_read: true,
-    },
-    {
-        id: 'msg-003',
-        conversation_id: 'conv-001',
-        sender_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d2c1e9a7', // John Doe
-        content: 'I submitted an application but haven\'t heard back.',
-        timestamp: new Date('2025-10-24T14:10:00'),
-        is_read: true,
-    },
-    {
-        id: 'msg-004',
-        conversation_id: 'conv-001',
-        sender_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d21w4eg6', // Admin
-        content: 'Let me check that for you. Your application has been approved!',
-        timestamp: new Date('2025-10-24T14:25:00'),
-        is_read: true,
-    },
-    {
-        id: 'msg-005',
-        conversation_id: 'conv-001',
-        sender_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d2c1e9a7', // John Doe
-        content: 'Thank you for your help!',
-        timestamp: new Date('2025-10-24T14:30:00'),
-        is_read: true,
-    },
-
-    // Messages for conv-002 (John Doe <-> Green Earth Foundation)
-    {
-        id: 'msg-006',
-        conversation_id: 'conv-002',
-        sender_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d2c1e9a7', // John Doe
-        content: 'Hi! I\'m interested in the Tree Planting Marathon.',
-        timestamp: new Date('2025-10-25T09:30:00'),
-        is_read: true,
-    },
-    {
-        id: 'msg-007',
-        conversation_id: 'conv-002',
-        sender_id: 'org-1a45e3b9-56d8-40c3-9e2f-2d8c1fefb512', // Green Earth
-        content: 'Great! We\'d love to have you join us.',
-        timestamp: new Date('2025-10-25T09:45:00'),
-        is_read: true,
-    },
-    {
-        id: 'msg-008',
-        conversation_id: 'conv-002',
-        sender_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d2c1e9a7', // John Doe
-        content: 'When does the tree planting start?',
-        timestamp: new Date('2025-10-25T10:15:00'),
-        is_read: false, // Unread message
-    },
-
-    // Messages for conv-003 (Jane Smith <-> Helping Hands PH)
-    {
-        id: 'msg-009',
-        conversation_id: 'conv-003',
-        sender_id: 'vol-82a9a1c4-5f23-4c7d-91f8-c4f1b1a93f56', // Jane Smith
-        content: 'I saw your Food for All campaign.',
-        timestamp: new Date('2025-10-23T16:00:00'),
-        is_read: true,
-    },
-    {
-        id: 'msg-010',
-        conversation_id: 'conv-003',
-        sender_id: 'org-72e91a6d-0d58-4a7a-87f4-27fbb70db71f', // Helping Hands
-        content: 'Yes! We need volunteers for meal distribution.',
-        timestamp: new Date('2025-10-23T16:20:00'),
-        is_read: true,
-    },
-    {
-        id: 'msg-011',
-        conversation_id: 'conv-003',
-        sender_id: 'vol-82a9a1c4-5f23-4c7d-91f8-c4f1b1a93f56', // Jane Smith
-        content: 'I can help with the food distribution.',
-        timestamp: new Date('2025-10-23T16:45:00'),
-        is_read: true,
-    },
-
-    // Messages for conv-004 (Green Earth <-> Admin)
-    {
-        id: 'msg-012',
-        conversation_id: 'conv-004',
-        sender_id: 'org-1a45e3b9-56d8-40c3-9e2f-2d8c1fefb512', // Green Earth
-        content: 'Hello, we submitted a new campaign for approval.',
-        timestamp: new Date('2025-10-25T08:00:00'),
-        is_read: true,
-    },
-    {
-        id: 'msg-013',
-        conversation_id: 'conv-004',
-        sender_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d21w4eg6', // Admin
-        content: 'I\'ll review it shortly.',
-        timestamp: new Date('2025-10-25T08:30:00'),
-        is_read: true,
-    },
-    {
-        id: 'msg-014',
-        conversation_id: 'conv-004',
-        sender_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d21w4eg6', // Admin
-        content: 'Campaign approval status update',
-        timestamp: new Date('2025-10-25T09:00:00'),
-        is_read: false, // Unread messages
-    },
-
-    // Messages for conv-005 (Mark Tan <-> Admin)
-    {
-        id: 'msg-015',
-        conversation_id: 'conv-005',
-        sender_id: 'vol-cb62e5c9-2f76-44b3-8c27-748dca6a924e', // Mark Tan
-        content: 'How do I update my profile?',
-        timestamp: new Date('2025-10-22T11:20:00'),
-        is_read: true,
-    },
-    {
-        id: 'msg-016',
-        conversation_id: 'conv-005',
-        sender_id: 'vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d21w4eg6', // Admin
-        content: 'Go to Dashboard, then click on your name in the top right.',
-        timestamp: new Date('2025-10-22T11:25:00'),
-        is_read: true,
-    },
 ];

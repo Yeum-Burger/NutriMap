@@ -3,7 +3,7 @@ import {Button, Card, CardActions, CardContent, CardHeader, TextField, Typograph
 import {useContext, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import type {LogInFormData} from "../../interfaces/interfaces.ts";
-import {mobile_context} from "../../main.tsx";
+import {mobile_context} from "../../mobile_context.ts";
 import {useAuth} from "../../services/auth_service.tsx";
 import { PATHS } from "../../PATHS.ts";
 

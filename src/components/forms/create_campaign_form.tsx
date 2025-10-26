@@ -8,7 +8,7 @@ import {
     Chip,
 } from "@mui/material";
 import type { CreateCampaignFormData, TaskDraft } from "../../interfaces/interfaces.ts";
-import {mobile_context} from "../../main.tsx";
+import {mobile_context} from "../../mobile_context";
 
 interface FormErrors {
     name?: string;

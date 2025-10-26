@@ -2,7 +2,7 @@ import {LoginOutlined, MenuOutlined} from "@mui/icons-material";
 import {Button, IconButton, Menu, MenuItem} from "@mui/material";
 import {useContext, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {mobile_context} from "../../main.tsx";
+import {mobile_context} from "../../mobile_context";
 import {PATHS} from "../../PATHS.ts";
 import theme from "../../theme.ts";
 

@@ -30,11 +30,12 @@ describe('AuthService', () => {
         password: 'password123',
       }
 
-      await waitFor(async () => {
-        await result.current.log_in(loginData)
+      await result.current.log_in(loginData)
+
+      await waitFor(() => {
+        expect(result.current.logged_in).toBe(true)
       })
 
-      expect(result.current.logged_in).toBe(true)
       expect(result.current.user_type).toBe(USER_TYPES.VOLUNTEER)
       expect(result.current.user).toBeDefined()
       expect(result.current.user?.email).toBe('john.doe@example.com')
@@ -50,11 +51,12 @@ describe('AuthService', () => {
         password: 'password123',
       }
 
-      await waitFor(async () => {
-        await result.current.log_in(loginData)
+      await result.current.log_in(loginData)
+
+      await waitFor(() => {
+        expect(result.current.logged_in).toBe(true)
       })
 
-      expect(result.current.logged_in).toBe(true)
       expect(result.current.user_type).toBe(USER_TYPES.ORGANIZATION)
     })
 
@@ -65,14 +67,15 @@ describe('AuthService', () => {
 
       const loginData: LogInFormData = {
         email: 'admin@nutrimap.com',
-        password: 'admin123',
+        password: 'password123',
       }
 
-      await waitFor(async () => {
-        await result.current.log_in(loginData)
+      await result.current.log_in(loginData)
+
+      await waitFor(() => {
+        expect(result.current.logged_in).toBe(true)
       })
 
-      expect(result.current.logged_in).toBe(true)
       expect(result.current.user_type).toBe(USER_TYPES.ADMIN)
     })
 
@@ -112,15 +115,18 @@ describe('AuthService', () => {
         password: 'password123',
       }
 
-      await waitFor(async () => {
-        await result.current.log_in(loginData)
-      })
+      await result.current.log_in(loginData)
 
-      expect(result.current.logged_in).toBe(true)
+      await waitFor(() => {
+        expect(result.current.logged_in).toBe(true)
+      })
 
       result.current.log_out()
 
-      expect(result.current.logged_in).toBe(false)
+      await waitFor(() => {
+        expect(result.current.logged_in).toBe(false)
+      })
+
       expect(result.current.user).toBeNull()
       expect(result.current.user_type).toBeNull()
       expect(localStorage.getItem('user')).toBeNull()

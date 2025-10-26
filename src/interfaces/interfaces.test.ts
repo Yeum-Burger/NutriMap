@@ -12,7 +12,7 @@ import type {
   CreateCampaignFormData,
   TaskDraft,
   ApplicationDraft,
-  BarangayRiskData,
+  BarangayRiskData
 } from './interfaces'
 
 describe('Interface Type Validation', () => {

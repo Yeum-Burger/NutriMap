@@ -97,7 +97,7 @@ describe('CampaignCard', () => {
     })
 
     const viewButton = screen.queryByRole('button', { name: /view/i })
-    expect(viewButton).toHaveStyle({ display: 'none' })
+    expect(viewButton).toBeNull()
   })
 
   it('should display "No Available Campaigns" when campaign is null', async () => {

@@ -1,6 +1,6 @@
 import {Box, Link} from "@mui/material"
 import {useContext} from "react";
-import {mobile_context} from "../../main.tsx";
+import {mobile_context} from "../../mobile_context";
 
 function Footer() {
     const is_mobile = useContext(mobile_context)

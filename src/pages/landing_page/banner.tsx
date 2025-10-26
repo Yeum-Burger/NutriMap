@@ -3,7 +3,7 @@ import {Box, Button, Typography} from "@mui/material";
 import {useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import banner from "../../assets/banner.jpg";
-import {mobile_context} from "../../main.tsx";
+import {mobile_context} from "../../mobile_context";
 import {PATHS} from "../../PATHS.ts";
 import theme from "../../theme.ts";
 

@@ -2,7 +2,7 @@ import {Box, ToggleButton, ToggleButtonGroup, Typography} from "@mui/material";
 import {useContext, useState} from "react";
 import OrganizationForm from "../../../components/forms/organization_form.tsx";
 import VolunteerForm from "../../../components/forms/volunteer_form.tsx";
-import {mobile_context} from "../../../main.tsx";
+import {mobile_context} from "../../../mobile_context";
 import {USER_TYPES} from "../../../PATHS.ts";
 
 function Join () {

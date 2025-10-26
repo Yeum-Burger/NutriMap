@@ -2,7 +2,7 @@ import {VisibilityOffOutlined, VisibilityOutlined} from "@mui/icons-material";
 import {Button, Card, CardActions, CardContent, CardHeader, IconButton, InputAdornment, TextField} from "@mui/material";
 import {useContext, useState} from "react";
 import type {JoinOrganizationFormData} from "../../interfaces/interfaces.ts";
-import {mobile_context} from "../../main.tsx";
+import {mobile_context} from "../../mobile_context.ts";
 
 
 interface FormErrors {

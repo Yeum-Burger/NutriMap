@@ -2,7 +2,7 @@ import {Box, Typography} from "@mui/material"
 import {useContext, useEffect, useState} from "react";
 import CampaignCard from "../../components/campaign_card.tsx";
 import Carousel from "../../components/carousel.tsx";
-import {mobile_context} from "../../main.tsx";
+import {mobile_context} from "../../mobile_context";
 import {getApprovedCampaignIDs} from "../../services/campaign_service.ts";
 
 function LatestCampaigns() {
