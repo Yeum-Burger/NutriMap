@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {getApprovedCampaignIDs, getCampaignByID, getCampaignIDs, updateCampaignStatus} from './campaign_service'
+import {getCampaignByID, getCampaignIDs} from './campaign_service'
 
 describe('CampaignService', () => {
   describe('getCampaignIDs', () => {
@@ -33,22 +33,6 @@ describe('CampaignService', () => {
     })
   })
 
-  describe('getApprovedCampaignIDs', () => {
-    it('should return only approved campaign IDs', async () => {
-      const response = await getApprovedCampaignIDs()
-      
-      expect(response.data).toBeDefined()
-      expect(Array.isArray(response.data)).toBe(true)
-    })
-
-    it('should return limited approved campaign IDs when count provided', async () => {
-      const count = 1
-      const response = await getApprovedCampaignIDs(count)
-      
-      expect(response.data.length).toBeLessThanOrEqual(count)
-    })
-  })
-
   describe('getCampaignByID', () => {
     it('should return campaign when valid ID is provided', async () => {
       const response = await getCampaignByID('1')
@@ -65,39 +49,6 @@ describe('CampaignService', () => {
 
     it('should throw error when undefined ID is provided', async () => {
       await expect(getCampaignByID(undefined)).rejects.toThrow('Campaign not found.')
-    })
-  })
-
-  describe('updateCampaignStatus', () => {
-    it('should update campaign status to approved', async () => {
-      const response = await updateCampaignStatus('1', 'approved')
-      
-      expect(response.data).toBeUndefined()
-      
-      const updatedCampaign = await getCampaignByID('1')
-      expect(updatedCampaign.data.status).toBe('approved')
-    })
-
-    it('should update campaign status to rejected', async () => {
-      const response = await updateCampaignStatus('1', 'rejected')
-      
-      expect(response.data).toBeUndefined()
-      
-      const updatedCampaign = await getCampaignByID('1')
-      expect(updatedCampaign.data.status).toBe('rejected')
-    })
-
-    it('should update campaign status to pending', async () => {
-      const response = await updateCampaignStatus('1', 'pending')
-      
-      expect(response.data).toBeUndefined()
-      
-      const updatedCampaign = await getCampaignByID('1')
-      expect(updatedCampaign.data.status).toBe('pending')
-    })
-
-    it('should throw error when campaign not found', async () => {
-      await expect(updateCampaignStatus('999', 'approved')).rejects.toThrow('Campaign not found.')
     })
   })
 })

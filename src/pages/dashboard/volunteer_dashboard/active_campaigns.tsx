@@ -3,26 +3,26 @@ import {useContext, useEffect, useState} from "react";
 import CampaignCard from "../../../components/campaign_card.tsx";
 import Carousel from "../../../components/carousel.tsx";
 import {mobile_context} from "../../../mobile_context.ts";
-import {getApprovedCampaignIDs} from "../../../services/campaign_service.ts";
+import {getCampaignIDs} from "../../../services/campaign_service.ts";
 
 function ActiveCampaigns() {
     const is_mobile = useContext(mobile_context)
     const [ids, setIds] = useState<string[] | null>(null)
 
     useEffect(() => {
-        async function get_approved_campaign_ids() {
+        async function get_campaign_ids() {
             try {
-                const response = await getApprovedCampaignIDs()
+                const response = await getCampaignIDs()
                 setIds(response.data)
             } catch (error) {
                 console.log(error)
             }
         }
-        get_approved_campaign_ids()
+        get_campaign_ids()
     }, [])
     if (!ids) return null
     const campaigns = ids.map((id) => (
-        <CampaignCard key={id} id={id} hide_status={true} />
+        <CampaignCard key={id} id={id} />
     ))
     return is_mobile
         ? <Box sx={{

@@ -3,7 +3,7 @@ import {useContext, useEffect, useState} from "react";
 import CampaignCard from "../../components/campaign_card.tsx";
 import Carousel from "../../components/carousel.tsx";
 import {mobile_context} from "../../mobile_context";
-import {getApprovedCampaignIDs} from "../../services/campaign_service.ts";
+import {getCampaignIDs} from "../../services/campaign_service.ts";
 
 function LatestCampaigns() {
     const is_mobile = useContext(mobile_context)
@@ -12,8 +12,8 @@ function LatestCampaigns() {
     useEffect(() => {
         async function get_campaign_ids() {
             try {
-                const response = await getApprovedCampaignIDs(3)
-                setIds(response.data)
+                const response = await getCampaignIDs()
+                setIds(response.data.slice(0, 3))
             } catch (error) {
                 console.log(error)
             }
@@ -25,7 +25,7 @@ function LatestCampaigns() {
     if (!ids) return null
     const campaigns = ids.map((id) => (
         <Box key={id} sx={{ flex: '1 1 0', minWidth: 0, display: 'flex' }}>
-            <CampaignCard id={id} hide_status={true} hide_button={true} />
+            <CampaignCard id={id} hide_button={true} />
         </Box>
     ))
 

@@ -29,15 +29,6 @@ export async function getUserByID(id: string | undefined) {
 export async function getOrganizationIDs(): Promise<AxiosResponse<string[]>> {
     await delay(400);
 
-    const org_ids = mockOrganizations.filter(c => c.status === 'pending').map(c => c.id)
+    const org_ids = mockOrganizations.map(c => c.id)
     return { data: org_ids } as AxiosResponse<string[]>;
-}
-export async function updateOrganizationStatus(id: string | undefined, status: string) {
-    await delay(400);
-
-    const org = mockOrganizations.find(o => o.id === id);
-    if (org) {
-        org.status = status;
-    }
-    return { data: org };
 }

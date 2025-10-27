@@ -3,6 +3,7 @@ import {Button, Card, CardActions, CardContent, CardHeader, IconButton, InputAdo
 import {useContext, useState} from "react";
 import type {JoinVolunteerFormData} from "../../interfaces/interfaces.ts";
 import {mobile_context} from "../../mobile_context.ts";
+import Notification from "../notification.tsx";
 
 
 interface FormErrors {
@@ -19,6 +20,7 @@ function VolunteerForm() {
     const togglePasswordVisibility = () => setShowPassword(prev => !prev);
     const [showPassword2, setShowPassword2] = useState(false);
     const togglePasswordVisibility2 = () => setShowPassword2(prev => !prev);
+    const [notification, setNotification] = useState({ open: false, message: "", severity: "success" as "success" | "error" });
     const [form_data, setFormData] = useState<JoinVolunteerFormData>({
         f_name: "",
         l_name: "",
@@ -66,6 +68,7 @@ function VolunteerForm() {
         if (Object.keys(newErrors).length > 0) return;
 
         console.log("Form submitted:", form_data);
+        setNotification({ open: true, message: "Account created successfully!", severity: "success" });
         // TODO: PASS FORM DATA TO ACCOUNT CREATION SERVICE
     };
 
@@ -169,6 +172,12 @@ function VolunteerForm() {
                     Create Account
                 </Button>
             </CardActions>
+            <Notification
+                open={notification.open}
+                message={notification.message}
+                severity={notification.severity}
+                onClose={() => setNotification({ ...notification, open: false })}
+            />
         </Card>
     )
 }

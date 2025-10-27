@@ -3,9 +3,10 @@ import {Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Typograp
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import type {ApplicationDraft, Campaign} from "../../interfaces/interfaces.ts";
-import {STATUS} from "../../PATHS.ts";
 import {useAuth} from "../../services/auth_service.tsx";
 import {getCampaignByID} from "../../services/campaign_service.ts";
+import {getAvailableLotsForTask} from "../../services/volunteer_application_service.ts";
+import Notification from "../../components/notification.tsx";
 
 function CampaignInfo () {
     const {id} = useParams<{ id: string }>();
@@ -14,12 +15,21 @@ function CampaignInfo () {
     const [loading, setLoading] = useState<boolean>(true)
     const [task, setTask] = useState('')
     const [error, setError] = useState(false)
+    const [taskLots, setTaskLots] = useState<Map<string, number>>(new Map())
+    const [notification, setNotification] = useState({ open: false, message: "", severity: "success" as "success" | "error" })
 
     useEffect(() => {
         async function get_campaign() {
             try {
                 const response = await getCampaignByID(id)
                 setCampaign(response.data)
+                
+                const lotsMap = new Map<string, number>();
+                for (const task of response.data.task) {
+                    const lots = await getAvailableLotsForTask(task.id);
+                    lotsMap.set(task.id, lots);
+                }
+                setTaskLots(lotsMap);
             } catch (error) {
                 console.log(error)
             } finally {
@@ -35,11 +45,14 @@ function CampaignInfo () {
         }}>
             <Typography variant="body1" fontWeight={'bold'}>{t.name}</Typography>
             <Typography variant="body1">- {t.description}</Typography>
+            <Typography variant="body2" color="text.secondary">
+                Available lots: {taskLots.get(t.id) ?? 0} / {t.quota}
+            </Typography>
         </Box>
     ))
     const tasks = campaign?.task.map((t) => (
         <MenuItem value={t.id} key={t.id}>
-            {t.name}
+            {t.name} ({taskLots.get(t.id) ?? 0} lots available)
         </MenuItem>
     ))
 
@@ -55,11 +68,11 @@ function CampaignInfo () {
         }
         const application: ApplicationDraft = {
             c_task_id: task,
-            status: STATUS.PENDING,
             user_id: user?.id ?? ''
         }
         console.log(application);
-        // TODO: CREATE A NEW ENTRY IN APPLICATIONS TABLE, ALSO ADD FEEDBACK AFTER APPLYING
+        setNotification({ open: true, message: "Application submitted successfully!", severity: "success" });
+        // TODO: CREATE A NEW ENTRY IN APPLICATIONS TABLE
     };
 
 
@@ -151,6 +164,12 @@ function CampaignInfo () {
                     </>
                 }
             </Box>
+            <Notification
+                open={notification.open}
+                message={notification.message}
+                severity={notification.severity}
+                onClose={() => setNotification({ ...notification, open: false })}
+            />
         </Box>
     )
 }

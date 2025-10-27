@@ -35,16 +35,20 @@ export async function getTaskByID(id: string | undefined) {
 
 }
 
-export async function updateApplicationStatus(id: string | undefined, status: 'approved' | 'rejected' | 'pending'): Promise<AxiosResponse<void>> {
-    await delay(400);
-    const application = mockApplications.find(a => a.id === id);
+// CALCULATE AVAILABLE LOTS FOR A TASK
+export async function getAvailableLotsForTask(taskId: string | undefined): Promise<number> {
+    await delay(200);
     
-    if (!application) {
-        throw new Error('Application not found.');
-    }
+    const task = mockCampaigns
+        .flatMap(c => c.task)
+        .find(t => t.id === taskId);
     
-    application.status = status;
-    return { data: undefined } as AxiosResponse<void>;
+    if (!task) throw new Error("Task not found.");
+    
+    const quota = parseInt(task.quota);
+    const applicationsCount = mockApplications.filter(app => app.c_task_id === taskId).length;
+    
+    return Math.max(0, quota - applicationsCount);
 }
 
 

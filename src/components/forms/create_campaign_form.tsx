@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import type { CreateCampaignFormData, TaskDraft } from "../../interfaces/interfaces.ts";
 import {mobile_context} from "../../mobile_context";
+import Notification from "../notification.tsx";
 
 interface FormErrors {
     name?: string;
@@ -22,6 +23,7 @@ interface FormErrors {
 
 function CreateCampaignForm() {
     const is_mobile = useContext(mobile_context)
+    const [notification, setNotification] = useState({ open: false, message: "", severity: "success" as "success" | "error" });
     const [form_data, setFormData] = useState<CreateCampaignFormData>({
         name: "",
         location: "",
@@ -105,6 +107,7 @@ function CreateCampaignForm() {
         if (Object.keys(newErrors).length > 0) return;
 
         console.log("Form submitted:", form_data);
+        setNotification({ open: true, message: "Campaign submitted for proposal!", severity: "success" });
         // TODO: pass form_data to campaign creation service
     };
 
@@ -248,6 +251,12 @@ function CreateCampaignForm() {
             <Button onClick={handle_submit} fullWidth>
                 Submit for Proposal
             </Button>
+            <Notification
+                open={notification.open}
+                message={notification.message}
+                severity={notification.severity}
+                onClose={() => setNotification({ ...notification, open: false })}
+            />
         </Box>
     );
 }

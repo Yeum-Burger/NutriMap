@@ -23,8 +23,3 @@ export const USER_TYPES = {
     ORGANIZATION: 'ORGANIZATION',
     ADMIN: 'ADMIN',
 }
-export const STATUS = {
-    APPROVED: 'APPROVED',
-    REJECTED: 'REJECTED',
-    PENDING: 'PENDING',
-}

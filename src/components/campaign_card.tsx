@@ -4,14 +4,13 @@ import {
     LocationOnOutlined,
     RemoveRedEyeOutlined
 } from "@mui/icons-material";
-import {Box, Button, Card, CardActions, CardContent, CardHeader, Chip, Typography} from "@mui/material"
+import {Box, Button, Card, CardActions, CardContent, CardHeader, Typography} from "@mui/material"
 import {useEffect, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import type {Campaign} from "../interfaces/interfaces.ts";
 import {PATHS, USER_TYPES} from "../PATHS.ts";
 import {useAuth} from "../services/auth_service.tsx";
 import {getCampaignByID} from "../services/campaign_service.ts";
-import theme from "../theme.ts";
 
 interface CardProps {
     id: string
@@ -20,9 +19,8 @@ interface CardProps {
     hide_location?: boolean
     hide_date?: boolean
     hide_description?: boolean
-    hide_status?: boolean
 }
-function CampaignCard({id, hide_button, hide_org, hide_location, hide_date, hide_description, hide_status}: CardProps) {
+function CampaignCard({id, hide_button, hide_org, hide_location, hide_date, hide_description}: CardProps) {
     const {user_type} = useAuth()
     const [campaign, setCampaign] = useState<Campaign | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
@@ -40,14 +38,6 @@ function CampaignCard({id, hide_button, hide_org, hide_location, hide_date, hide
                 navigate(`${PATHS.CAMPAIGN_MANAGER}/${id}`);
         }
     };
-    const chip_color = () => {
-        if (campaign?.status === 'approved')
-            return theme.palette.primary.main
-        else if (campaign?.status === 'rejected')
-            return '#ff0000'
-        else if (campaign?.status === 'pending')
-            return 'orange'
-    }
 
     useEffect(() => {
         async function get_campaign() {
@@ -119,13 +109,6 @@ function CampaignCard({id, hide_button, hide_org, hide_location, hide_date, hide
                         <CalendarTodayOutlined />
                         {new Date(campaign.date).toLocaleDateString()}
                     </Typography>
-                    <Chip label={campaign.status.toUpperCase()} sx={{
-                        my: 1,
-                        width: "fit-content",
-                        display: !hide_status ? "flex" : "none",
-                        backgroundColor: chip_color(),
-                        color: theme.palette.primary.contrastText,
-                    }}/>
                 </Box>
                 <Typography variant={'body1'}
                             sx={{

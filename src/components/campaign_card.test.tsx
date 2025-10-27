@@ -136,22 +136,4 @@ describe('CampaignCard', () => {
       expect(dateText).toBeInTheDocument()
     })
   })
-
-  it('should display status chip with correct text', async () => {
-    vi.mocked(campaignService.getCampaignByID).mockResolvedValue({
-      data: mockCampaign,
-    } as any)
-
-    render(
-      <MemoryRouter>
-        <AuthProvider>
-          <CampaignCard id="1" />
-        </AuthProvider>
-      </MemoryRouter>
-    )
-
-    await waitFor(() => {
-      expect(screen.getByText('APPROVED')).toBeInTheDocument()
-    })
-  })
 })

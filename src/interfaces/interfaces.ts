@@ -10,7 +10,6 @@ export interface Volunteer extends User {
 export interface Organization extends User {
     organization_name: string,
     address: string,
-    status: string,
 }
 export interface Campaign {
     id: string,
@@ -20,7 +19,6 @@ export interface Campaign {
     location: string,
     date: Date,
     description: string,
-    status: string,
     task: CampaignTask[],
 }
 export interface CampaignTask {
@@ -34,7 +32,6 @@ export interface Application {
     id: string,
     c_task_id: string,
     user_id: string,
-    status: string,
 }
 export interface LogInFormData {
     email: string;
@@ -69,7 +66,6 @@ export interface TaskDraft {
 export interface ApplicationDraft {
     c_task_id: string,
     user_id: string,
-    status: string,
 }
 export interface BarangayRiskData {
     id: string;

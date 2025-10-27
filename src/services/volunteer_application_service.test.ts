@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { 
   getApplicationIDs, 
   getApplicationByID, 
-  getTaskByID, 
-  updateApplicationStatus 
+  getTaskByID,
+  getAvailableLotsForTask
 } from './volunteer_application_service'
 
 describe('VolunteerApplicationService', () => {
@@ -39,7 +39,6 @@ describe('VolunteerApplicationService', () => {
       expect(response.data.id).toBe('1')
       expect(response.data.c_task_id).toBeDefined()
       expect(response.data.user_id).toBeDefined()
-      expect(response.data.status).toBeDefined()
     })
 
     it('should throw error when application not found', async () => {
@@ -71,40 +70,20 @@ describe('VolunteerApplicationService', () => {
     })
   })
 
-  describe('updateApplicationStatus', () => {
-    it('should update application status to approved', async () => {
-      const response = await updateApplicationStatus('1', 'approved')
+  describe('getAvailableLotsForTask', () => {
+    it('should return available lots based on quota and applications', async () => {
+      const availableLots = await getAvailableLotsForTask('1')
       
-      expect(response.data).toBeUndefined()
-      
-      const updatedApplication = await getApplicationByID('1')
-      expect(updatedApplication.data.status).toBe('approved')
+      expect(availableLots).toBeGreaterThanOrEqual(0)
+      expect(typeof availableLots).toBe('number')
     })
 
-    it('should update application status to rejected', async () => {
-      const response = await updateApplicationStatus('1', 'rejected')
-      
-      expect(response.data).toBeUndefined()
-      
-      const updatedApplication = await getApplicationByID('1')
-      expect(updatedApplication.data.status).toBe('rejected')
-    })
-
-    it('should update application status to pending', async () => {
-      const response = await updateApplicationStatus('1', 'pending')
-      
-      expect(response.data).toBeUndefined()
-      
-      const updatedApplication = await getApplicationByID('1')
-      expect(updatedApplication.data.status).toBe('pending')
-    })
-
-    it('should throw error when application not found', async () => {
-      await expect(updateApplicationStatus('999', 'approved')).rejects.toThrow('Application not found.')
+    it('should throw error when task not found', async () => {
+      await expect(getAvailableLotsForTask('999')).rejects.toThrow('Task not found.')
     })
 
     it('should throw error when undefined ID is provided', async () => {
-      await expect(updateApplicationStatus(undefined, 'approved')).rejects.toThrow('Application not found.')
+      await expect(getAvailableLotsForTask(undefined)).rejects.toThrow('Task not found.')
     })
   })
 })

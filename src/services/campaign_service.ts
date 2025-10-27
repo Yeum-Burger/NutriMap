@@ -16,14 +16,6 @@ export async function getCampaignIDs(count?: number, user_id?: string): Promise<
     return { data: counted_ids } as AxiosResponse<string[]>;
 }
 
-export async function getApprovedCampaignIDs(count?: number): Promise<AxiosResponse<string[]>> {
-    const ids= mockCampaigns
-        .filter(c => c.status === 'approved')
-        .map(c => c.id);
-    const counted_ids = count ? ids.slice(0, count) : ids;
-
-    return {data: counted_ids} as AxiosResponse<string[]>
-}
 // GET CAMPAIGN BY ID
 export async function getCampaignByID(id: string | undefined) {
     await delay(400);
@@ -33,18 +25,6 @@ export async function getCampaignByID(id: string | undefined) {
         throw new Error('Campaign not found.');
     }
     return { data: campaign }
-}
-
-export async function updateCampaignStatus(id: string | undefined, status: 'approved' | 'rejected' | 'pending'): Promise<AxiosResponse<void>> {
-    await delay(400);
-    const campaign = mockCampaigns.find(c => c.id === id);
-    
-    if (!campaign) {
-        throw new Error('Campaign not found.');
-    }
-    
-    campaign.status = status;
-    return { data: undefined } as AxiosResponse<void>;
 }
 
 

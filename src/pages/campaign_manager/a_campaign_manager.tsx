@@ -17,13 +17,10 @@ function A_CampaignManager() {
                 const campaignPromises = ids.map(id => getCampaignByID(id));
                 const campaigns = await Promise.all(campaignPromises);
 
-                // Sort campaigns: pending first, then others
+                // Sort campaigns by date
                 const sorted = campaigns
                     .map(c => c.data)
                     .sort((a, b) => {
-                        if (a.status === 'pending' && b.status !== 'pending') return -1;
-                        if (a.status !== 'pending' && b.status === 'pending') return 1;
-                        // Optional: further sort by date within same status
                         return new Date(b.date).getTime() - new Date(a.date).getTime();
                     })
                     .map(c => c.id);

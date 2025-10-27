@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { PATHS, USER_TYPES, STATUS } from './PATHS'
+import { PATHS, USER_TYPES } from './PATHS'
 
 describe('PATHS Constants', () => {
   describe('Route Paths', () => {
@@ -40,20 +40,6 @@ describe('PATHS Constants', () => {
       const types = Object.values(USER_TYPES)
       expect(types.length).toBe(3)
       expect(new Set(types).size).toBe(3)
-    })
-  })
-
-  describe('Status Constants', () => {
-    it('should have all status types defined', () => {
-      expect(STATUS.APPROVED).toBe('APPROVED')
-      expect(STATUS.REJECTED).toBe('REJECTED')
-      expect(STATUS.PENDING).toBe('PENDING')
-    })
-
-    it('should have three distinct status types', () => {
-      const statuses = Object.values(STATUS)
-      expect(statuses.length).toBe(3)
-      expect(new Set(statuses).size).toBe(3)
     })
   })
 })

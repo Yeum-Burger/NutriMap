@@ -50,7 +50,6 @@ export const mockOrganizations: Organization[] = [
         password: "password123",
         organization_name: "Test Food Bank",
         address: "123 Test Street, Test City, Philippines",
-        status: "pending",
     },
     {
         id: "org-1a45e3b9-56d8-40c3-9e2f-2d8c1fefb512",
@@ -58,7 +57,6 @@ export const mockOrganizations: Organization[] = [
         password: "orgpass123",
         organization_name: "Green Earth Foundation",
         address: "123 Eco Street, Makati City, Philippines",
-        status: "approved",
     },
     {
         id: "org-72e91a6d-0d58-4a7a-87f4-27fbb70db71f",
@@ -66,7 +64,6 @@ export const mockOrganizations: Organization[] = [
         password: "help2025",
         organization_name: "Helping Hands PH",
         address: "45 Bayanihan Ave, Quezon City, Philippines",
-        status: "pending",
     },
     {
         id: "org-bd52f1ca-4c2e-4f6b-b84b-6e3b19f27bdf",
@@ -74,7 +71,6 @@ export const mockOrganizations: Organization[] = [
         password: "savepets!",
         organization_name: "Animal Care Society",
         address: "78 Paw Street, Cebu City, Philippines",
-        status: "rejected",
     },
 ];
 
@@ -88,7 +84,6 @@ export const mockCampaigns: Campaign[] = [
         location: "Test City",
         date: new Date("2025-11-10"),
         description: "A test campaign for food distribution.",
-        status: "approved",
         task: [
             {
                 id: "1",
@@ -107,7 +102,6 @@ export const mockCampaigns: Campaign[] = [
         location: "Cebu City",
         date: new Date("2025-11-10"),
         description: "A campaign to provide clean water to remote communities.",
-        status: "pending",
         task: [
             {
                 id: "task-001",
@@ -133,7 +127,6 @@ export const mockCampaigns: Campaign[] = [
         location: "Davao City",
         date: new Date("2025-12-01"),
         description: "Join volunteers to plant 5,000 trees in deforested areas.",
-        status: "approved",
         task: [
             {
                 id: "task-003",
@@ -159,7 +152,6 @@ export const mockCampaigns: Campaign[] = [
         location: "Manila",
         date: new Date("2025-10-30"),
         description: "Feeding program for urban poor families affected by floods.",
-        status: "rejected",
         task: [
             {
                 id: "task-005",
@@ -185,7 +177,6 @@ export const mockCampaigns: Campaign[] = [
         location: "Quezon City",
         date: new Date("2025-11-05"),
         description: "Encouraging people to donate blood to save lives.",
-        status: "approved",
         task: [
             {
                 id: "task-007",
@@ -204,7 +195,6 @@ export const mockCampaigns: Campaign[] = [
         location: "Taguig",
         date: new Date("2025-12-15"),
         description: "Raising funds for school supplies for underprivileged kids.",
-        status: "pending",
         task: [
             {
                 id: "task-008",
@@ -221,49 +211,41 @@ export const mockApplications: Application[] = [
         id: "1",
         c_task_id: "1",
         user_id: "1",
-        status: "approved",
     },
     {
         id: "app-001",
         c_task_id: "task-001",
         user_id: "vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d2c1e9a7",
-        status: "approved",
     },
     {
         id: "app-002",
         c_task_id: "task-002",
         user_id: "vol-82a9a1c4-5f23-4c7d-91f8-c4f1b1a93f56",
-        status: "pending",
     },
     {
         id: "app-003",
         c_task_id: "task-003",
         user_id: "vol-cb62e5c9-2f76-44b3-8c27-748dca6a924e",
-        status: "approved",
     },
     {
         id: "app-004",
         c_task_id: "task-004",
         user_id: "vol-82a9a1c4-5f23-4c7d-91f8-c4f1b1a93f56",
-        status: "rejected",
     },
     {
         id: "app-005",
         c_task_id: "task-005",
         user_id: "vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d2c1e9a7",
-        status: "pending",
     },
     {
         id: "app-006",
         c_task_id: "task-007",
         user_id: "vol-cb62e5c9-2f76-44b3-8c27-748dca6a924e",
-        status: "approved",
     },
     {
         id: "app-007",
         c_task_id: "task-008",
         user_id: "vol-3f8b9d8c-2b1f-4a6e-bf17-94b4d2c1e9a7",
-        status: "pending",
     },
 ];
 

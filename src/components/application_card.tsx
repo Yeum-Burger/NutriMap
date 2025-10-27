@@ -4,14 +4,13 @@ import {
     RemoveRedEyeOutlined,
     WorkOutlineOutlined
 } from "@mui/icons-material";
-import {Box, Button, Card, CardActions, CardContent, CardHeader, Chip, Typography} from "@mui/material";
+import {Box, Button, Card, CardActions, CardContent, CardHeader, Typography} from "@mui/material";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import type {Application, Campaign, CampaignTask} from "../interfaces/interfaces.ts";
 import {PATHS} from "../PATHS.ts";
 import {getCampaignByID} from "../services/campaign_service.ts";
 import {getApplicationByID, getTaskByID} from "../services/volunteer_application_service.ts";
-import theme from "../theme.ts";
 
 interface ApplicationCardProps {
     id: string;
@@ -25,14 +24,6 @@ function ApplicationCard({id}: ApplicationCardProps) {
     const handle_click = () => {
         console.log(id)
         navigate(`${PATHS.APPLICATION_INFO}/${id}`)
-    }
-    const chip_color = () => {
-        if (application?.status === 'approved')
-            return theme.palette.primary.main
-        else if (application?.status === 'rejected')
-            return '#ff0000'
-        else if (application?.status === 'pending')
-            return 'orange'
     }
 
     useEffect(() => {
@@ -103,12 +94,6 @@ function ApplicationCard({id}: ApplicationCardProps) {
                         <WorkOutlineOutlined />
                         {task?.name}
                     </Typography>
-                    <Chip label={application.status.toUpperCase()} sx={{
-                        my: 1,
-                        width: "fit-content",
-                        backgroundColor: chip_color(),
-                        color: theme.palette.primary.contrastText,
-                    }}/>
                 </Box>
                 <Typography variant={'body1'}>
                     {task?.description}

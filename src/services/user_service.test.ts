@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getUserName, getUserByID, getOrganizationIDs, updateOrganizationStatus } from './user_service'
+import { getUserName, getUserByID, getOrganizationIDs } from './user_service'
 import { USER_TYPES } from '../PATHS'
 
 describe('UserService', () => {
@@ -61,37 +61,6 @@ describe('UserService', () => {
       
       expect(response.data).toBeDefined()
       expect(Array.isArray(response.data)).toBe(true)
-    })
-
-    it('should only return pending organizations', async () => {
-      const response = await getOrganizationIDs()
-      
-      expect(response.data).toBeDefined()
-      expect(Array.isArray(response.data)).toBe(true)
-    })
-  })
-
-  describe('updateOrganizationStatus', () => {
-    it('should update organization status to approved', async () => {
-      const response = await updateOrganizationStatus('2', 'approved')
-      
-      expect(response.data).toBeDefined()
-      expect(response.data?.status).toBe('approved')
-    })
-
-    it('should update organization status to rejected', async () => {
-      const response = await updateOrganizationStatus('2', 'rejected')
-      
-      expect(response.data).toBeDefined()
-      expect(response.data?.status).toBe('rejected')
-    })
-
-    it('should return organization data after update', async () => {
-      const response = await updateOrganizationStatus('2', 'pending')
-      
-      expect(response.data).toBeDefined()
-      expect(response.data?.id).toBe('2')
-      expect(response.data?.organization_name).toBeDefined()
     })
   })
 })

@@ -1,22 +1,30 @@
 import {CalendarTodayOutlined, CorporateFareOutlined, LocationOnOutlined} from "@mui/icons-material";
-import {Box, Chip, Typography} from "@mui/material"
+import {Box, Typography} from "@mui/material"
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import type {Campaign} from "../../interfaces/interfaces.ts";
 import {getCampaignByID} from "../../services/campaign_service.ts";
-import theme from "../../theme.ts";
+import {getAvailableLotsForTask} from "../../services/volunteer_application_service.ts";
 import ApplicationList from "./application_list.tsx";
 
 function O_CampaignInfo () {
     const {id} = useParams<{ id: string }>();
     const [campaign, setCampaign] = useState<Campaign>()
     const [loading, setLoading] = useState<boolean>(true)
+    const [taskLots, setTaskLots] = useState<Map<string, number>>(new Map())
 
     useEffect(() => {
         async function get_campaign() {
             try {
                 const response = await getCampaignByID(id)
                 setCampaign(response.data)
+                
+                const lotsMap = new Map<string, number>();
+                for (const task of response.data.task) {
+                    const lots = await getAvailableLotsForTask(task.id);
+                    lotsMap.set(task.id, lots);
+                }
+                setTaskLots(lotsMap);
             } catch (error) {
                 console.log(error)
             } finally {
@@ -25,14 +33,7 @@ function O_CampaignInfo () {
         }
         get_campaign()
     }, [id])
-    const chip_color = () => {
-        if (campaign?.status === 'approved')
-            return theme.palette.primary.main
-        else if (campaign?.status === 'rejected')
-            return '#ff0000'
-        else if (campaign?.status === 'pending')
-            return 'orange'
-    }
+    
     const tasks_description = campaign?.task.map((t) => (
         <Box key={t.id} sx={{
             display: "flex",
@@ -40,6 +41,9 @@ function O_CampaignInfo () {
         }}>
             <Typography variant="body1" fontWeight={'bold'}>{t.name}</Typography>
             <Typography variant="body1">- {t.description}</Typography>
+            <Typography variant="body2" color="text.secondary">
+                Available lots: {taskLots.get(t.id) ?? 0} / {t.quota}
+            </Typography>
         </Box>
     ))
 
@@ -76,12 +80,6 @@ function O_CampaignInfo () {
                     <CalendarTodayOutlined />
                     {campaign?.date.toLocaleDateString()}
                 </Typography>
-                <Chip label={campaign?.status.toUpperCase()} sx={{
-                    my: 1,
-                    width: "fit-content",
-                    backgroundColor: chip_color(),
-                    color: theme.palette.primary.contrastText,
-                }}/>
                 <Typography variant={'body1'}
                             sx={{
                                 textAlign: "justify",

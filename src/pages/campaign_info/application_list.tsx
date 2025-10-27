@@ -1,10 +1,9 @@
 
-import {Box, Button, Chip, List, ListItem, ListItemText, Paper, Typography} from "@mui/material";
+import {Box, List, ListItem, ListItemText, Paper, Typography} from "@mui/material";
 import {useEffect, useState} from "react";
 import type {Application, CampaignTask, Volunteer} from "../../interfaces/interfaces.ts";
 import {mockApplications, mockCampaigns, mockVolunteers} from "../../interfaces/mock_data.ts";
 import {delay} from "../../services/global_service.ts";
-import theme from "../../theme.ts";
 
 interface ApplicationListProps {
     c_id: string;
@@ -43,14 +42,6 @@ function ApplicationList({c_id}: ApplicationListProps) {
     const [tasks, setTasks] = useState<Map<string, CampaignTask>>(new Map());
     const [loading, setLoading] = useState<boolean>(true);
 
-    const handleApprove = (applicationId: string, volunteerName: string) => {
-        console.log(`Approved application ${applicationId} for ${volunteerName}`);
-    };
-
-    const handleDecline = (applicationId: string, volunteerName: string) => {
-        console.log(`Declined application ${applicationId} for ${volunteerName}`);
-    };
-
     useEffect(() => {
         async function fetchApplications() {
             try {
@@ -79,13 +70,6 @@ function ApplicationList({c_id}: ApplicationListProps) {
 
         fetchApplications();
     }, [c_id]);
-
-    const getChipColor = (status: string) => {
-        if (status === 'approved') return theme.palette.primary.main;
-        if (status === 'rejected') return '#ff0000';
-        if (status === 'pending') return 'orange';
-        return 'grey';
-    };
 
     if (loading) {
         return (
@@ -136,42 +120,10 @@ function ApplicationList({c_id}: ApplicationListProps) {
                                     primary={`${volunteer?.first_name} ${volunteer?.last_name}`}
                                     secondary={volunteer?.email}
                                 />
-                                <Chip
-                                    label={app.status.toUpperCase()}
-                                    sx={{
-                                        backgroundColor: getChipColor(app.status),
-                                        color: theme.palette.primary.contrastText,
-                                    }}
-                                />
                             </Box>
                             <Typography variant="body2" color="text.secondary">
                                 Task: {task?.name}
                             </Typography>
-                            {app.status === 'pending' && (
-                                <Box sx={{
-                                    display: 'flex',
-                                    gap: 1,
-                                    mt: 1,
-                                    justifyContent: 'flex-end'
-                                }}>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        size="small"
-                                        onClick={() => handleApprove(app.id, `${volunteer?.first_name} ${volunteer?.last_name}`)}
-                                    >
-                                        Approve
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        color="error"
-                                        size="small"
-                                        onClick={() => handleDecline(app.id, `${volunteer?.first_name} ${volunteer?.last_name}`)}
-                                    >
-                                        Decline
-                                    </Button>
-                                </Box>
-                            )}
                         </ListItem>
                     );
                 })}
