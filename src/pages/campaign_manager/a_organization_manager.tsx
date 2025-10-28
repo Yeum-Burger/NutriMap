@@ -6,10 +6,10 @@ import type {Organization} from "../../interfaces/interfaces.ts";
 import {getOrganizationIDs, getUserByID} from "../../services/user_service.ts";
 
 function A_OrganizationManager() {
-    const [ids, setIds] = useState<string[] | null>(null);
+    const [ids, setIds] = useState<number[] | null>(null);
     const [organizations, setOrganizations] = useState<Organization[]>([]);
     const navigate = useNavigate();
-    const handle_click = (id: string) => {
+    const handle_click = (id: number) => {
         navigate(`${id}`)
     }
 

@@ -9,19 +9,21 @@ import {getAvailableLotsForTask} from "../../services/volunteer_application_serv
 function A_CampaignInfo() {
     const {id} = useParams<{ id: string }>();
     const [campaign, setCampaign] = useState<Campaign>()
-    const [taskLots, setTaskLots] = useState<Map<string, number>>(new Map())
+    const [taskLots, setTaskLots] = useState<Map<number, number>>(new Map())
     const [loading, setLoading] = useState<boolean>(true)
 
     useEffect(() => {
         async function get_campaign() {
             try {
-                const response = await getCampaignByID(id)
+                const response = await getCampaignByID(id ? parseInt(id) : undefined)
                 setCampaign(response.data)
                 
-                const lotsMap = new Map<string, number>();
-                for (const task of response.data.task) {
-                    const lots = await getAvailableLotsForTask(task.id);
-                    lotsMap.set(task.id, lots);
+                const lotsMap = new Map<number, number>();
+                if (response.data.task) {
+                    for (const task of response.data.task) {
+                        const lots = await getAvailableLotsForTask(task.id);
+                        lotsMap.set(task.id, lots);
+                    }
                 }
                 setTaskLots(lotsMap);
             } catch (error) {
@@ -33,7 +35,7 @@ function A_CampaignInfo() {
         get_campaign()
     }, [id])
 
-    const tasks_description = campaign?.task.map((t) => (
+    const tasks_description = campaign?.task?.map((t) => (
         <Box key={t.id} sx={{
             display: "flex",
             flexDirection: "column",
@@ -77,7 +79,7 @@ function A_CampaignInfo() {
                 </Typography>
                 <Typography variant={'body1'}>
                     <CalendarTodayOutlined />
-                    {campaign?.date.toLocaleDateString()}
+                    {campaign?.date?.toLocaleDateString()}
                 </Typography>
                 <Typography variant={'body1'}
                             sx={{

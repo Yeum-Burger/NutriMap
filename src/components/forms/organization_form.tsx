@@ -1,47 +1,29 @@
-import {VisibilityOffOutlined, VisibilityOutlined} from "@mui/icons-material";
-import {Button, Card, CardActions, CardContent, CardHeader, IconButton, InputAdornment, TextField} from "@mui/material";
+import {Button, Card, CardActions, CardContent, CardHeader, TextField} from "@mui/material";
 import {useContext, useState} from "react";
 import type {JoinOrganizationFormData} from "../../interfaces/interfaces.ts";
 import {mobile_context} from "../../mobile_context.ts";
 import Notification from "../notification.tsx";
+import {createOrganization} from "../../services/user_service.ts";
 
 
 interface FormErrors {
     organization_name?: string;
     address?: string;
     email?: string;
-    password?: string;
-    c_password?: string;
 }
 
 function OrganizationForm() {
     const is_mobile = useContext(mobile_context);
-    const [showPassword, setShowPassword] = useState(false);
-    const togglePasswordVisibility = () => setShowPassword(prev => !prev);
-    const [showPassword2, setShowPassword2] = useState(false);
-    const togglePasswordVisibility2 = () => setShowPassword2(prev => !prev);
     const [notification, setNotification] = useState({ open: false, message: "", severity: "success" as "success" | "error" });
     const [form_data, setFormData] = useState<JoinOrganizationFormData>({
         organization_name: "",
         address: "",
         email: "",
-        password: "",
-        c_password: "",
     })
     const handle_change = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         const updatedForm = { ...form_data, [name]: value };
         setFormData(updatedForm);
-
-        // Live password match check
-        if (name === "c_password" || name === "password") {
-            if (updatedForm.c_password && updatedForm.password !== updatedForm.c_password) {
-                setErrors(prev => ({ ...prev, c_password: "Passwords do not match" }));
-            } else {
-                setErrors(prev => ({ ...prev, c_password: undefined }));
-            }
-        }
-
     }
 
     const [errors, setErrors] = useState<FormErrors>({})
@@ -58,20 +40,19 @@ function OrganizationForm() {
             if (!emailRegex.test(form_data.email)) {
                 newErrors.email = "Invalid email address";
             }
-            // TODO: CHECK IF EMAIL IS IN USE ALREADY
         }
-
-        if (!form_data.password.trim()) newErrors.password = "This field is required";
-        if (!form_data.c_password.trim()) newErrors.c_password = "This field is required";
 
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length > 0) return;
 
-        console.log("Form submitted:", form_data);
-        setNotification({ open: true, message: "Organization account created successfully!", severity: "success" });
-        // TODO: PASS FORM DATA TO ACCOUNT CREATION SERVICE
-
+        try {
+            await createOrganization(form_data);
+            setNotification({ open: true, message: "Organization account created successfully!", severity: "success" });
+            setFormData({ organization_name: "", address: "", email: "" });
+        } catch (error) {
+            setNotification({ open: true, message: error instanceof Error ? error.message : "Failed to create account", severity: "error" });
+        }
     };
 
     return (
@@ -81,7 +62,7 @@ function OrganizationForm() {
             width: is_mobile ? "75%" : "50%",
         }}>
             <CardHeader title={'Welcome to NutriMap!'}
-                        subheader={'Please enter your details'}
+                        subheader={'Enter your details'}
             />
             <CardContent sx={{
                 display: "flex",
@@ -111,60 +92,6 @@ function OrganizationForm() {
                            helperText={errors.email}
                            value={form_data.email}
                            onChange={handle_change}
-                />
-                <TextField
-                    name="password"
-                    label="Password"
-                    type={showPassword ? "text" : "password"}
-                    error={!!errors.password}
-                    helperText={errors.password}
-                    value={form_data.password}
-                    onChange={handle_change}
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <IconButton onClick={togglePasswordVisibility}
-                                            edge="end"
-                                            sx={{
-                                                backgroundColor: 'transparent',
-                                                border: 'none',
-                                                color: 'black',
-                                                '&: hover': {
-                                                    color: 'black'
-                                                }
-                                            }}>
-                                    {showPassword ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
-                                </IconButton>
-                            </InputAdornment>
-                        ),
-                    }}
-                />
-
-                <TextField name={'c_password'}
-                           label={'Confirm Password'}
-                           type={showPassword2 ? "text" : "password"}
-                           error={!!errors.c_password}
-                           helperText={errors.c_password}
-                           value={form_data.c_password}
-                           onChange={handle_change}
-                           InputProps={{
-                               endAdornment: (
-                                   <InputAdornment position="end">
-                                       <IconButton onClick={togglePasswordVisibility2}
-                                                   edge="end"
-                                                   sx={{
-                                                       backgroundColor: 'transparent',
-                                                       border: 'none',
-                                                       color: 'black',
-                                                       '&: hover': {
-                                                           color: 'black'
-                                                       }
-                                                   }}>
-                                           {showPassword2 ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
-                                       </IconButton>
-                                   </InputAdornment>
-                               ),
-                           }}
                 />
             </CardContent>
             <CardActions>

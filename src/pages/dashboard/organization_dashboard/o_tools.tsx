@@ -10,7 +10,7 @@ import {getCampaignIDs} from "../../../services/campaign_service.ts";
 function OrganizationTools () {
     const is_mobile = useContext(mobile_context)
     const { user } = useAuth()
-    const [ids, setIds] = useState<string[] | null>(null)
+    const [ids, setIds] = useState<number[] | null>(null)
     const navigate = useNavigate();
     const handle_click = (path: string) => {
         navigate(path)

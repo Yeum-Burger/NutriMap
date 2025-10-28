@@ -1,7 +1,4 @@
 import {
-    CalendarTodayOutlined,
-    CorporateFareOutlined,
-    LocationOnOutlined,
     RemoveRedEyeOutlined
 } from "@mui/icons-material";
 import {Box, Button, Card, CardActions, CardContent, CardHeader, Typography} from "@mui/material"
@@ -13,14 +10,14 @@ import {useAuth} from "../services/auth_service.tsx";
 import {getCampaignByID} from "../services/campaign_service.ts";
 
 interface CardProps {
-    id: string
+    id: number
     hide_button?: boolean
     hide_org?: boolean
     hide_location?: boolean
     hide_date?: boolean
     hide_description?: boolean
 }
-function CampaignCard({id, hide_button, hide_org, hide_location, hide_date, hide_description}: CardProps) {
+function CampaignCard({id, hide_button, hide_description}: CardProps) {
     const {user_type} = useAuth()
     const [campaign, setCampaign] = useState<Campaign | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
@@ -70,14 +67,13 @@ function CampaignCard({id, hide_button, hide_org, hide_location, hide_date, hide
 
     return (
         <Card sx={{
-            m: 1,
             p: 1,
             flexGrow: 1,
             width: '100%',
             display: 'flex',
             flexDirection: 'column'
         }}>
-            <CardHeader title={campaign.name} />
+            <CardHeader title={campaign.title} />
             <CardContent sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -91,24 +87,7 @@ function CampaignCard({id, hide_button, hide_org, hide_location, hide_date, hide
                     flexDirection: "column",
                     gap: 1
                 }}>
-                    <Typography variant={'body1'} sx={{
-                        display: !hide_org ? "flex" : "none",
-                    }}>
-                        <CorporateFareOutlined />
-                        {campaign.organization_name}
-                    </Typography>
-                    <Typography variant={'body1'} sx={{
-                        display: !hide_location ? "flex" : "none",
-                    }}>
-                        <LocationOnOutlined />
-                        {campaign.location}
-                    </Typography>
-                    <Typography variant={'body1'} sx={{
-                        display: !hide_date ? "flex" : "none",
-                    }}>
-                        <CalendarTodayOutlined />
-                        {new Date(campaign.date).toLocaleDateString()}
-                    </Typography>
+                    {/* Organization name, location, and date removed - not in schema */}
                 </Box>
                 <Typography variant={'body1'}
                             sx={{

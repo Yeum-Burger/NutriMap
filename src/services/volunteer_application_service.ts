@@ -1,54 +1,146 @@
-import {type AxiosResponse} from 'axios';
-import {mockApplications, mockCampaigns} from "../interfaces/mock_data.ts";
-import {delay} from "./global_service.ts";
+import { supabase } from "./global_service.ts";
+import type { Application, ApplicationDraft, CampaignTask } from "../interfaces/interfaces.ts";
 
-// TODO: ADJUST THESE API CALLS TO ACTUALLY FETCH FROM THE DB
-// GET CAMPAIGN IDs THAT THE USER APPLIED TO
-export async function getApplicationIDs(user_id: string | undefined): Promise<AxiosResponse<string[]>> {
-    await delay(400);
-    const ids= mockApplications
-        .filter((a) => a.user_id === user_id)
-        .map((a) => a.id)
-
-    return {data: ids} as AxiosResponse<string[]>
-}
-// GET APPLICATION USING ID
-export async function getApplicationByID(id: string | undefined) {
-    await delay(400);
-    const application = mockApplications.find((a) => a.id === id);
-    if (!application) {
-        throw new Error('Campaign not found.');
+export async function getApplicationIDs(volunteer_id: number | undefined): Promise<{ data: number[] }> {
+    if (!volunteer_id) {
+        console.error('Volunteer ID is required for getApplicationIDs');
+        throw new Error('Volunteer ID is required.');
     }
-    return { data: application }
+    
+    const { data, error } = await supabase
+        .from('Application')
+        .select('id')
+        .eq('volunteer_id', volunteer_id);
+    
+    if (error) {
+        console.error('Error fetching application IDs:', error);
+        throw new Error(error.message);
+    }
+    
+    if (!data) {
+        console.warn('No applications found for volunteer:', volunteer_id);
+        return { data: [] };
+    }
+    
+    return { data: data.map((a) => a.id) };
 }
-// GET CAMPAIGN TASK USING ID
-export async function getTaskByID(id: string | undefined) {
-    await delay(400);
 
-    const task = mockCampaigns
-        .flatMap(c => c.task)
-        .find(t => t.id === id);
-
-    if (!task) throw new Error("Task not found.");
-
-    return { data: task };
-
+export async function createApplication(applicationData: ApplicationDraft): Promise<{ data: { application_id: number } }> {
+    if (!applicationData.volunteer_id || !applicationData.campaign_task_id) {
+        console.error('Missing required fields for application:', applicationData);
+        throw new Error('Volunteer ID and Campaign Task ID are required.');
+    }
+    
+    const { data, error } = await supabase
+        .from('Application')
+        .insert([{
+            volunteer_id: applicationData.volunteer_id,
+            campaign_task_id: applicationData.campaign_task_id
+        }])
+        .select('id')
+        .single();
+    
+    if (error) {
+        console.error('Error creating application:', error);
+        throw new Error(error.message);
+    }
+    
+    if (!data) {
+        console.error('No data returned after application creation');
+        throw new Error('Failed to create application.');
+    }
+    
+    return { data: { application_id: data.id } };
 }
 
-// CALCULATE AVAILABLE LOTS FOR A TASK
-export async function getAvailableLotsForTask(taskId: string | undefined): Promise<number> {
-    await delay(200);
+export async function getApplicationByID(id: number | undefined) {
+    if (!id) {
+        console.error('Application ID is required for getApplicationByID');
+        throw new Error('Application ID is required.');
+    }
     
-    const task = mockCampaigns
-        .flatMap(c => c.task)
-        .find(t => t.id === taskId);
+    const { data, error } = await supabase
+        .from('Application')
+        .select('*')
+        .eq('id', id)
+        .single();
     
-    if (!task) throw new Error("Task not found.");
+    if (error) {
+        console.error(`Error fetching application ${id}:`, error);
+        throw new Error(error.message);
+    }
     
-    const quota = parseInt(task.quota);
-    const applicationsCount = mockApplications.filter(app => app.c_task_id === taskId).length;
+    if (!data) {
+        console.warn(`Application ${id} not found`);
+        throw new Error('Application not found.');
+    }
     
-    return Math.max(0, quota - applicationsCount);
+    return { data: data as Application };
+}
+
+export async function getTaskByID(id: number | undefined) {
+    if (!id) {
+        console.error('Task ID is required for getTaskByID');
+        throw new Error('Task ID is required.');
+    }
+    
+    const { data, error } = await supabase
+        .from('Campaign_Task')
+        .select('*')
+        .eq('id', id)
+        .single();
+    
+    if (error) {
+        console.error(`Error fetching task ${id}:`, error);
+        throw new Error(error.message);
+    }
+    
+    if (!data) {
+        console.warn(`Task ${id} not found`);
+        throw new Error("Task not found.");
+    }
+    
+    return { data: data as CampaignTask };
+}
+
+export async function getAvailableLotsForTask(taskId: number | undefined): Promise<number> {
+    if (!taskId) {
+        console.error('Task ID is required for getAvailableLotsForTask');
+        throw new Error('Task ID is required.');
+    }
+    
+    const { data: task, error: taskError } = await supabase
+        .from('Campaign_Task')
+        .select('volunteer_quota')
+        .eq('id', taskId)
+        .single();
+    
+    if (taskError) {
+        console.error(`Error fetching task ${taskId} for available lots:`, taskError);
+        throw new Error(taskError.message);
+    }
+    
+    if (!task) {
+        console.warn(`Task ${taskId} not found for available lots calculation`);
+        throw new Error("Task not found.");
+    }
+    
+    const { count, error: countError } = await supabase
+        .from('Application')
+        .select('*', { count: 'exact', head: true })
+        .eq('campaign_task_id', taskId);
+    
+    if (countError) {
+        console.error(`Error counting applications for task ${taskId}:`, countError);
+        throw new Error(countError.message);
+    }
+    
+    const applicationsCount = count || 0;
+    const availableLots = Math.max(0, task.volunteer_quota - applicationsCount);
+    
+    console.log(`Task ${taskId}: ${availableLots} lots available (${applicationsCount}/${task.volunteer_quota} filled)`);
+    
+    return availableLots;
 }
 
 

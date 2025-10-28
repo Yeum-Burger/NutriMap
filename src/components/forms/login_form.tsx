@@ -9,7 +9,6 @@ import { PATHS } from "../../PATHS.ts";
 
 interface FormErrors {
     email?: string;
-    password?: string;
 }
 
 function LogInForm() {
@@ -26,7 +25,6 @@ function LogInForm() {
     const [log_in_error, setLogInError] = useState<string>("");
     const [form_data, setFormData] = useState<LogInFormData>({
         email: "",
-        password: "",
     })
     const handle_change = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({... form_data, [e.target.name]: e.target.value })
@@ -40,21 +38,17 @@ function LogInForm() {
         if (!form_data.email.trim()) {
             newErrors.email = "This field is required";
         } else {
-            // Regex for email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(form_data.email)) {
                 newErrors.email = "Invalid email address";
             }
         }
-        if (!form_data.password.trim()) newErrors.password = "This field is required";
 
         setErrors(newErrors)
 
         if (Object.keys(newErrors).length > 0)
             return;
 
-        // All fields are valid, proceed
-        console.log("Form submitted:", form_data);
         try {
             await log_in(form_data);
         } catch (error: any) {
@@ -70,7 +64,7 @@ function LogInForm() {
             width: is_mobile ? "75%" : "50%",
         }}>
             <CardHeader title={'Welcome Back!'}
-                        subheader={'Enter your log in details'}
+                        subheader={'Enter your email to log in'}
             />
             <CardContent sx={{
                 display: "flex",
@@ -93,14 +87,6 @@ function LogInForm() {
                            error={!!errors.email}
                            helperText={errors.email}
                            value={form_data.email}
-                           onChange={handle_change}
-                />
-                <TextField name={'password'}
-                           label={'Password'}
-                           type={'password'}
-                           error={!!errors.password}
-                           helperText={errors.password}
-                           value={form_data.password}
                            onChange={handle_change}
                 />
             </CardContent>

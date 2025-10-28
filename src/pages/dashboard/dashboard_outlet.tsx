@@ -22,9 +22,10 @@ function DashboardOutlet() {
 
     const pathSegments = location.pathname.split("/").filter(Boolean);
 
-    // Check if a segment is an ID (UUID or custom ID pattern)
+    // Check if a segment is an ID (integer, UUID or custom ID pattern)
     const isId = (str: string) => {
-        return /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(str) || // UUID
+        return /^\d+$/.test(str) || // Integer ID
+            /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(str) || // UUID
             /^[a-z]+-[0-9]+$/i.test(str); // Pattern like "app-001", "vol-123"
     };
 

@@ -1,52 +1,121 @@
-import {createContext, type ReactNode, useContext, useState} from "react";
+import {createContext, type ReactNode, useContext, useEffect, useState} from "react";
 import type {LogInFormData, User} from "../interfaces/interfaces.ts";
-import {mockAdmin, mockOrganizations, mockVolunteers} from "../interfaces/mock_data.ts";
 import {USER_TYPES} from "../PATHS.ts";
-import {delay} from "./global_service.ts";
+import {supabase} from "./supabase_client.ts";
 
 interface Auth {
     user: User | null
     logged_in: boolean
     user_type: string | null
     log_in: (log_in_data: LogInFormData) => Promise<void>
-    log_out: () => void
+    log_out: () => Promise<void>
 }
 const AuthContext = createContext<Auth>({
     user: null,
     logged_in: false,
     user_type: null,
     log_in: async (_log_in_data:LogInFormData) => {},
-    log_out: () => {}
+    log_out: async () => {}
 });
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [logged_in, setLoggedIn] = useState(false);
     const [user_type, setUserType] = useState<string | null>(null);
 
-    const log_in = async (log_in_data: LogInFormData) => {
-        let u_type: string | null = null;
+    useEffect(() => {
+        // Check for existing session on mount
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session?.user) {
+                loadUserProfile(session.user.email!);
+            }
+        });
 
-        // pass a callback to receive the type
-        const verifiedUser = await verifyLogInData(log_in_data, (t: string) => { u_type = t; });
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (session?.user) {
+                loadUserProfile(session.user.email!);
+            } else {
+                setUser(null);
+                setLoggedIn(false);
+                setUserType(null);
+            }
+        });
 
-        if (!verifiedUser) {
-            throw new Error('Incorrect account details');
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const loadUserProfile = async (email: string) => {
+        // Check if user is a volunteer
+        const { data: volunteer } = await supabase
+            .from('Volunteer')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (volunteer) {
+            setUser({ id: volunteer.id, email: volunteer.email });
+            setUserType(USER_TYPES.VOLUNTEER);
+            setLoggedIn(true);
+            localStorage.setItem('user', JSON.stringify({ id: volunteer.id, email: volunteer.email }));
+            localStorage.setItem('user_type', JSON.stringify(USER_TYPES.VOLUNTEER));
+            return;
         }
 
-        setUser(verifiedUser);
-        setUserType(u_type);
-        setLoggedIn(true);
+        // Check if user is an organization
+        const { data: organization } = await supabase
+            .from('Organization')
+            .select('*')
+            .eq('email', email)
+            .single();
 
-        // use local variable 'type' because setState is async
-        localStorage.setItem('user', JSON.stringify(verifiedUser));
-        localStorage.setItem('logged_in', 'true');
-        localStorage.setItem('user_type', JSON.stringify(u_type));
-
-        console.log("User:", verifiedUser);
-        console.log("type:", u_type);
+        if (organization) {
+            setUser({ id: organization.id, email: organization.email });
+            setUserType(USER_TYPES.ORGANIZATION);
+            setLoggedIn(true);
+            localStorage.setItem('user', JSON.stringify({ id: organization.id, email: organization.email }));
+            localStorage.setItem('user_type', JSON.stringify(USER_TYPES.ORGANIZATION));
+            return;
+        }
     };
 
-    const log_out = () => {
+    const log_in = async (log_in_data: LogInFormData) => {
+        // Check if email exists in volunteers table
+        const { data: volunteer } = await supabase
+            .from('Volunteer')
+            .select('*')
+            .eq('email', log_in_data.email)
+            .single();
+
+        if (volunteer) {
+            setUser({ id: volunteer.id, email: volunteer.email });
+            setUserType(USER_TYPES.VOLUNTEER);
+            setLoggedIn(true);
+            localStorage.setItem('user', JSON.stringify({ id: volunteer.id, email: volunteer.email }));
+            localStorage.setItem('user_type', JSON.stringify(USER_TYPES.VOLUNTEER));
+            return;
+        }
+
+        // Check if email exists in organizations table
+        const { data: organization } = await supabase
+            .from('Organization')
+            .select('*')
+            .eq('email', log_in_data.email)
+            .single();
+
+        if (organization) {
+            setUser({ id: organization.id, email: organization.email });
+            setUserType(USER_TYPES.ORGANIZATION);
+            setLoggedIn(true);
+            localStorage.setItem('user', JSON.stringify({ id: organization.id, email: organization.email }));
+            localStorage.setItem('user_type', JSON.stringify(USER_TYPES.ORGANIZATION));
+            return;
+        }
+
+        throw new Error('Email not found in system');
+    };
+
+    const log_out = async () => {
+        await supabase.auth.signOut();
         setUser(null);
         setLoggedIn(false);
         setUserType(null);
@@ -68,30 +137,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
     return useContext(AuthContext);
-}
-
-
-async function verifyLogInData(
-    data: LogInFormData,
-    assign_type: (type: string) => void
-) {
-    await delay(400);
-
-    const volunteer = mockVolunteers.find(v => v.email === data.email);
-    const organization = mockOrganizations.find(o => o.email === data.email);
-    const admin = mockAdmin.find(a => a.email === data.email);
-
-    if (!volunteer && !organization && !admin) return null; // account does not exist
-    if ((volunteer && volunteer.password !== data.password) ||
-        (organization && organization.password !== data.password) ||
-        (admin && admin.password !== data.password)) {
-        return null; // incorrect password
-    }
-
-    // call callback to assign type
-    volunteer ? assign_type(USER_TYPES.VOLUNTEER)
-        : organization ? assign_type(USER_TYPES.ORGANIZATION)
-        : assign_type(USER_TYPES.ADMIN)
-
-    return volunteer ?? organization ?? admin;
 }

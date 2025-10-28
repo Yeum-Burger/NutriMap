@@ -7,7 +7,7 @@ import {getCampaignIDs} from "../../../services/campaign_service.ts";
 
 function ActiveCampaigns() {
     const is_mobile = useContext(mobile_context)
-    const [ids, setIds] = useState<string[] | null>(null)
+    const [ids, setIds] = useState<number[] | null>(null)
 
     useEffect(() => {
         async function get_campaign_ids() {
@@ -16,11 +16,28 @@ function ActiveCampaigns() {
                 setIds(response.data)
             } catch (error) {
                 console.log(error)
+                setIds([])
             }
         }
         get_campaign_ids()
     }, [])
     if (!ids) return null
+    
+    if (ids.length === 0) {
+        return (
+            <Paper sx={{
+                p: 2,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 2,
+            }}>
+                <Typography variant={'h3'}>Active Campaigns</Typography>
+                <Typography variant={'body1'}>No campaigns available at the moment.</Typography>
+            </Paper>
+        )
+    }
+    
     const campaigns = ids.map((id) => (
         <CampaignCard key={id} id={id} />
     ))

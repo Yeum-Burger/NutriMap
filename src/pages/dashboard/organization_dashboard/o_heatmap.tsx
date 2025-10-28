@@ -1,17 +1,24 @@
-import { Paper, Box, Typography, List, ListItem, ListItemText, Chip, ToggleButtonGroup, ToggleButton } from "@mui/material"
+import { Paper, Box, Typography, List, ListItem, ListItemText, Chip } from "@mui/material"
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
 import { useEffect, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type {BarangayRiskData} from "../../../interfaces/interfaces.ts";
-import { getRiskDataByTimePeriod, type TimePeriod } from '../../../services/risk_data_service.ts'
+import { getRiskDataByTimePeriod } from '../../../services/risk_data_service.ts'
 import barangaysData from '../../../assets/Barangays.json'
 
 function O_Heatmap() {
     const [geojsonData, setGeojsonData] = useState<any>(null)
     const [mapKey, setMapKey] = useState(0)
-    const [timePeriod, setTimePeriod] = useState<TimePeriod>('current')
-    const [riskData, setRiskData] = useState<BarangayRiskData[]>(getRiskDataByTimePeriod('current'))
+    const [riskData, setRiskData] = useState<BarangayRiskData[]>([])
+    
+    useEffect(() => {
+        async function fetchRiskData() {
+            const data = await getRiskDataByTimePeriod('current')
+            setRiskData(data)
+        }
+        fetchRiskData()
+    }, [])
     
     useEffect(() => {
         try {
@@ -25,17 +32,6 @@ function O_Heatmap() {
             console.error('Error loading GeoJSON:', error)
         }
     }, [])
-
-    useEffect(() => {
-        setRiskData(getRiskDataByTimePeriod(timePeriod))
-        setMapKey(prev => prev + 1)
-    }, [timePeriod])
-
-    const handleTimePeriodChange = (_event: React.MouseEvent<HTMLElement>, newPeriod: TimePeriod | null) => {
-        if (newPeriod !== null) {
-            setTimePeriod(newPeriod)
-        }
-    }
 
     const getColor = (brgyName: string) => {
         const barangay = riskData.find(b =>
@@ -90,25 +86,6 @@ function O_Heatmap() {
 
     return (
         <Paper sx={{ p: 3, height: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                <ToggleButtonGroup
-                    value={timePeriod}
-                    exclusive
-                    onChange={handleTimePeriodChange}
-                    aria-label="time period"
-                    fullWidth
-                >
-                    <ToggleButton value="current" aria-label="current">
-                        Current
-                    </ToggleButton>
-                    <ToggleButton value="6months" aria-label="6 months">
-                        In 6 Months
-                    </ToggleButton>
-                    <ToggleButton value="12months" aria-label="12 months">
-                        In 12 Months
-                    </ToggleButton>
-                </ToggleButtonGroup>
-            </Box>
             <MapContainer
                 center={[9.3068, 123.3054]}
                 zoom={13}

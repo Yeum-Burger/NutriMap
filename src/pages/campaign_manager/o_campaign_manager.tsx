@@ -6,7 +6,7 @@ import {getCampaignIDs} from "../../services/campaign_service.ts";
 
 function O_CampaignManager() {
     const { user } = useAuth()
-    const [ids, setIds] = useState<string[] | null>(null)
+    const [ids, setIds] = useState<number[] | null>(null)
 
     useEffect(() => {
         if (!user) return;
@@ -18,6 +18,7 @@ function O_CampaignManager() {
                 setIds(response.data);
             } catch (error) {
                 console.log(error);
+                setIds([]);
             }
         }
 
@@ -25,6 +26,16 @@ function O_CampaignManager() {
     }, [user?.id]);
 
     if (!ids) return null
+    
+    if (ids.length === 0) {
+        return (
+            <Box sx={{ p: 2 }}>
+                <Typography variant={'h5'}>No campaigns found for your organization.</Typography>
+                <Typography variant={'body2'}>Create a new campaign to get started.</Typography>
+            </Box>
+        )
+    }
+    
     const campaign = ids.map((id) => (
         <CampaignCard key={id} id={id} hide_description={true} hide_org={true}/>
     ))

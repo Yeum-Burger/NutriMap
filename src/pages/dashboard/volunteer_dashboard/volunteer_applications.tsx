@@ -9,7 +9,7 @@ import {getApplicationIDs} from "../../../services/volunteer_application_service
 function VolunteerApplications() {
     const { user } = useAuth()
     const is_mobile = useContext(mobile_context)
-    const [ids, setIds] = useState<string[] | null>(null)
+    const [ids, setIds] = useState<number[] | null>(null)
 
     useEffect(() => {
         async function get_application_ids() {

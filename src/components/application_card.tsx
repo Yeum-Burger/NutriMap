@@ -1,6 +1,4 @@
 import {
-    CorporateFareOutlined,
-    LocationOnOutlined,
     RemoveRedEyeOutlined,
     WorkOutlineOutlined
 } from "@mui/icons-material";
@@ -13,7 +11,7 @@ import {getCampaignByID} from "../services/campaign_service.ts";
 import {getApplicationByID, getTaskByID} from "../services/volunteer_application_service.ts";
 
 interface ApplicationCardProps {
-    id: string;
+    id: number;
 }
 function ApplicationCard({id}: ApplicationCardProps) {
     const [application, setApplication] = useState<Application | null>(null)
@@ -32,7 +30,7 @@ function ApplicationCard({id}: ApplicationCardProps) {
                 const _application = await getApplicationByID(id);
                 setApplication(_application.data);
 
-                const _task = await getTaskByID(_application.data.c_task_id);
+                const _task = await getTaskByID(_application.data.campaign_task_id);
                 setTask(_task.data);
 
                 const _campaign = await getCampaignByID(_task.data.campaign_id);
@@ -66,10 +64,9 @@ function ApplicationCard({id}: ApplicationCardProps) {
 
     return (
         <Card sx={{
-            m: 1,
             p: 1
         }}>
-            <CardHeader title={campaign?.name} />
+            <CardHeader title={campaign?.title} />
             <CardContent sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -82,21 +79,14 @@ function ApplicationCard({id}: ApplicationCardProps) {
                     flexDirection: "column",
                     gap: 1
                 }}>
-                    <Typography variant={'body1'}>
-                        <CorporateFareOutlined />
-                        {campaign?.organization_name}
-                    </Typography>
-                    <Typography variant={'body1'}>
-                        <LocationOnOutlined />
-                        {campaign?.location}
-                    </Typography>
+                    {/* Organization name and location removed - not in schema */}
                     <Typography variant={'body1'}>
                         <WorkOutlineOutlined />
-                        {task?.name}
+                        {task?.task_name}
                     </Typography>
                 </Box>
                 <Typography variant={'body1'}>
-                    {task?.description}
+                    {task?.task_description}
                 </Typography>
             </CardContent>
             <CardActions sx={{

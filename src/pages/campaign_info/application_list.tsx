@@ -1,45 +1,98 @@
-
 import {Box, List, ListItem, ListItemText, Paper, Typography} from "@mui/material";
 import {useEffect, useState} from "react";
 import type {Application, CampaignTask, Volunteer} from "../../interfaces/interfaces.ts";
-import {mockApplications, mockCampaigns, mockVolunteers} from "../../interfaces/mock_data.ts";
-import {delay} from "../../services/global_service.ts";
+import { supabase } from "../../services/global_service.ts";
 
 interface ApplicationListProps {
-    c_id: string;
+    c_id: number;
 }
 
-async function getApplicationsByCampaignId(campaignId: string) {
-    await delay(400);
-    const campaign = mockCampaigns.find((c) => c.id === campaignId);
-    if (!campaign) throw new Error("Campaign not found");
+async function getApplicationsByCampaignId(campaignId: number) {
+    const { data: campaign, error: campaignError } = await supabase
+        .from('Campaign')
+        .select('id')
+        .eq('id', campaignId)
+        .single();
+    
+    if (campaignError) {
+        console.error(`Error fetching campaign ${campaignId}:`, campaignError);
+        throw new Error(campaignError.message);
+    }
+    if (!campaign) {
+        console.warn(`Campaign ${campaignId} not found`);
+        throw new Error("Campaign not found");
+    }
 
-    const taskIds = campaign.task.map((t) => t.id);
-    const applications = mockApplications.filter((app) => taskIds.includes(app.c_task_id));
+    const { data: tasks, error: tasksError } = await supabase
+        .from('Campaign_Task')
+        .select('id')
+        .eq('campaign_id', campaignId);
+    
+    if (tasksError) {
+        console.error(`Error fetching tasks for campaign ${campaignId}:`, tasksError);
+        throw new Error(tasksError.message);
+    }
+    
+    if (!tasks || tasks.length === 0) {
+        console.log(`No tasks found for campaign ${campaignId}`);
+        return {data: []};
+    }
+    
+    const taskIds = tasks.map((t) => t.id);
+    
+    const { data: applications, error: appsError } = await supabase
+        .from('Application')
+        .select('*')
+        .in('campaign_task_id', taskIds);
+    
+    if (appsError) {
+        console.error(`Error fetching applications for campaign ${campaignId}:`, appsError);
+        throw new Error(appsError.message);
+    }
 
-    return {data: applications};
+    return {data: applications || []};
 }
 
-async function getVolunteerById(volunteerId: string) {
-    await delay(200);
-    const volunteer = mockVolunteers.find((v) => v.id === volunteerId);
-    if (!volunteer) throw new Error("Volunteer not found");
+async function getVolunteerById(volunteerId: number) {
+    const { data: volunteer, error } = await supabase
+        .from('Volunteer')
+        .select('*')
+        .eq('id', volunteerId)
+        .single();
+    
+    if (error) {
+        console.error(`Error fetching volunteer ${volunteerId}:`, error);
+        throw new Error(error.message);
+    }
+    if (!volunteer) {
+        console.warn(`Volunteer ${volunteerId} not found`);
+        throw new Error("Volunteer not found");
+    }
     return {data: volunteer};
 }
 
-async function getTaskById(taskId: string) {
-    await delay(200);
-    const task = mockCampaigns
-        .flatMap(c => c.task)
-        .find(t => t.id === taskId);
-    if (!task) throw new Error("Task not found");
+async function getTaskById(taskId: number) {
+    const { data: task, error } = await supabase
+        .from('Campaign_Task')
+        .select('*')
+        .eq('id', taskId)
+        .single();
+    
+    if (error) {
+        console.error(`Error fetching task ${taskId}:`, error);
+        throw new Error(error.message);
+    }
+    if (!task) {
+        console.warn(`Task ${taskId} not found`);
+        throw new Error("Task not found");
+    }
     return {data: task};
 }
 
 function ApplicationList({c_id}: ApplicationListProps) {
     const [applications, setApplications] = useState<Application[]>([]);
-    const [volunteers, setVolunteers] = useState<Map<string, Volunteer>>(new Map());
-    const [tasks, setTasks] = useState<Map<string, CampaignTask>>(new Map());
+    const [volunteers, setVolunteers] = useState<Map<number, Volunteer>>(new Map());
+    const [tasks, setTasks] = useState<Map<number, CampaignTask>>(new Map());
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -48,15 +101,15 @@ function ApplicationList({c_id}: ApplicationListProps) {
                 const response = await getApplicationsByCampaignId(c_id);
                 setApplications(response.data);
 
-                const volunteerMap = new Map<string, Volunteer>();
-                const taskMap = new Map<string, CampaignTask>();
+                const volunteerMap = new Map<number, Volunteer>();
+                const taskMap = new Map<number, CampaignTask>();
 
                 for (const app of response.data) {
-                    const volunteerResponse = await getVolunteerById(app.user_id);
-                    volunteerMap.set(app.user_id, volunteerResponse.data);
+                    const volunteerResponse = await getVolunteerById(app.volunteer_id);
+                    volunteerMap.set(app.volunteer_id, volunteerResponse.data);
 
-                    const taskResponse = await getTaskById(app.c_task_id);
-                    taskMap.set(app.c_task_id, taskResponse.data);
+                    const taskResponse = await getTaskById(app.campaign_task_id);
+                    taskMap.set(app.campaign_task_id, taskResponse.data);
                 }
 
                 setVolunteers(volunteerMap);
@@ -69,6 +122,41 @@ function ApplicationList({c_id}: ApplicationListProps) {
         }
 
         fetchApplications();
+
+        const channel = supabase
+            .channel('applications-changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'Application'
+                },
+                async (payload) => {
+                    const newApp = payload.new as Application;
+                    
+                    const { data: tasks } = await supabase
+                        .from('Campaign_Task')
+                        .select('campaign_id')
+                        .eq('id', newApp.campaign_task_id)
+                        .single();
+                    
+                    if (tasks?.campaign_id === c_id) {
+                        setApplications((prev) => [...prev, newApp]);
+                        
+                        const volunteerResponse = await getVolunteerById(newApp.volunteer_id);
+                        setVolunteers((prev) => new Map(prev).set(newApp.volunteer_id, volunteerResponse.data));
+                        
+                        const taskResponse = await getTaskById(newApp.campaign_task_id);
+                        setTasks((prev) => new Map(prev).set(newApp.campaign_task_id, taskResponse.data));
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [c_id]);
 
     if (loading) {
@@ -95,8 +183,8 @@ function ApplicationList({c_id}: ApplicationListProps) {
             </Typography>
             <List>
                 {applications.map((app) => {
-                    const volunteer = volunteers.get(app.user_id);
-                    const task = tasks.get(app.c_task_id);
+                    const volunteer = volunteers.get(app.volunteer_id);
+                    const task = tasks.get(app.campaign_task_id);
 
                     return (
                         <ListItem
@@ -117,12 +205,12 @@ function ApplicationList({c_id}: ApplicationListProps) {
                                 mb: 1
                             }}>
                                 <ListItemText
-                                    primary={`${volunteer?.first_name} ${volunteer?.last_name}`}
+                                    primary={`${volunteer?.f_name} ${volunteer?.l_name}`}
                                     secondary={volunteer?.email}
                                 />
                             </Box>
                             <Typography variant="body2" color="text.secondary">
-                                Task: {task?.name}
+                                Task: {task?.task_name}
                             </Typography>
                         </ListItem>
                     );

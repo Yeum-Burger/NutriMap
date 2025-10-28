@@ -1,0 +1,77 @@
+SQL:
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.Application (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  campaign_task_id bigint,
+  volunteer_id bigint,
+  CONSTRAINT Application_pkey PRIMARY KEY (id),
+  CONSTRAINT Application_campaign_task_id_fkey FOREIGN KEY (campaign_task_id) REFERENCES public.Campaign_Task(id),
+  CONSTRAINT Application_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES public.Volunteer(id)
+);
+CREATE TABLE public.Barangay (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  name character varying,
+  malnourished_count bigint,
+  severity smallint DEFAULT '0'::smallint,
+  risk_score double precision,
+  last_updated_date date,
+  CONSTRAINT Barangay_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.Barangay_Data (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  date_collected date,
+  barangay_id bigint,
+  malnourished_count bigint,
+  CONSTRAINT Barangay_Data_pkey PRIMARY KEY (id),
+  CONSTRAINT Barangay_Data_barangay_id_fkey FOREIGN KEY (barangay_id) REFERENCES public.Barangay(id)
+);
+CREATE TABLE public.Campaign (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  title character varying,
+  description character varying,
+  organization_id bigint,
+  CONSTRAINT Campaign_pkey PRIMARY KEY (id),
+  CONSTRAINT Campaign_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES public.Organization(id)
+);
+CREATE TABLE public.Campaign_Task (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  campaign_id bigint,
+  task_name character varying,
+  task_description character varying,
+  start_date timestamp without time zone,
+  volunteer_quota bigint,
+  CONSTRAINT Campaign_Task_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.Organization (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  name character varying,
+  type smallint DEFAULT '0'::smallint,
+  contact_person character varying,
+  email character varying,
+  contact_person_info character varying DEFAULT ''::character varying,
+  address character varying,
+  CONSTRAINT Organization_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.Volunteer (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  f_name character varying,
+  email character varying,
+  l_name character varying,
+  CONSTRAINT Volunteer_pkey PRIMARY KEY (id)
+);
+
+
+TODO: MATCH THE APPLICATION BASED ON THIS SQL SCHEMA, THE APP WILL ADJUST BASED ON THE SCHEMA. MODIFY COMPONENTS AS
+NECESSARY. CONNECT TO SUPABASE
+
+API KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6Y21jbm9zbmRjdXFoeWFld3plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MTY0MjYsImV4cCI6MjA3NTQ5MjQyNn0.vW8BFXm93DzAkQ8Ch5sj7eeR6nJ2-2bt_7_wt1Ux0Tw
+PROJECT LINK: https://rzcmcnosndcuqhyaewze.supabase.co

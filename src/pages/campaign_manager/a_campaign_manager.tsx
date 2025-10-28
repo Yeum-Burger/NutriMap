@@ -4,7 +4,7 @@ import CampaignCard from "../../components/campaign_card.tsx";
 import {getCampaignByID, getCampaignIDs} from "../../services/campaign_service.ts";
 
 function A_CampaignManager() {
-    const [sortedIds, setSortedIds] = useState<string[] | null>(null)
+    const [sortedIds, setSortedIds] = useState<number[] | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
 
     useEffect(() => {
@@ -21,6 +21,7 @@ function A_CampaignManager() {
                 const sorted = campaigns
                     .map(c => c.data)
                     .sort((a, b) => {
+                        if (!a.date || !b.date) return 0;
                         return new Date(b.date).getTime() - new Date(a.date).getTime();
                     })
                     .map(c => c.id);

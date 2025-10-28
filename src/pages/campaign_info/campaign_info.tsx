@@ -1,11 +1,10 @@
-import {CalendarTodayOutlined, CorporateFareOutlined, LocationOnOutlined} from "@mui/icons-material";
 import {Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Typography, Select, type SelectChangeEvent} from "@mui/material"
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import type {ApplicationDraft, Campaign} from "../../interfaces/interfaces.ts";
 import {useAuth} from "../../services/auth_service.tsx";
 import {getCampaignByID} from "../../services/campaign_service.ts";
-import {getAvailableLotsForTask} from "../../services/volunteer_application_service.ts";
+import {getAvailableLotsForTask, createApplication} from "../../services/volunteer_application_service.ts";
 import Notification from "../../components/notification.tsx";
 
 function CampaignInfo () {
@@ -13,21 +12,24 @@ function CampaignInfo () {
     const {user} = useAuth()
     const [campaign, setCampaign] = useState<Campaign>()
     const [loading, setLoading] = useState<boolean>(true)
-    const [task, setTask] = useState('')
+    const [task, setTask] = useState<number | ''>('')
     const [error, setError] = useState(false)
-    const [taskLots, setTaskLots] = useState<Map<string, number>>(new Map())
+    const [taskLots, setTaskLots] = useState<Map<number, number>>(new Map())
     const [notification, setNotification] = useState({ open: false, message: "", severity: "success" as "success" | "error" })
 
     useEffect(() => {
         async function get_campaign() {
             try {
-                const response = await getCampaignByID(id)
+                const campaignId = id ? parseInt(id) : undefined
+                const response = await getCampaignByID(campaignId)
                 setCampaign(response.data)
                 
-                const lotsMap = new Map<string, number>();
-                for (const task of response.data.task) {
-                    const lots = await getAvailableLotsForTask(task.id);
-                    lotsMap.set(task.id, lots);
+                const lotsMap = new Map<number, number>();
+                if (response.data.task) {
+                    for (const task of response.data.task) {
+                        const lots = await getAvailableLotsForTask(task.id);
+                        lotsMap.set(task.id, lots);
+                    }
                 }
                 setTaskLots(lotsMap);
             } catch (error) {
@@ -38,41 +40,56 @@ function CampaignInfo () {
         }
         get_campaign()
     }, [id])
-    const tasks_description = campaign?.task.map((t) => (
+    const tasks_description = campaign?.task?.map((t) => (
         <Box key={t.id} sx={{
             display: "flex",
             flexDirection: "column",
         }}>
-            <Typography variant="body1" fontWeight={'bold'}>{t.name}</Typography>
-            <Typography variant="body1">- {t.description}</Typography>
+            <Typography variant="body1" fontWeight={'bold'}>{t.task_name}</Typography>
+            <Typography variant="body1">- {t.task_description}</Typography>
             <Typography variant="body2" color="text.secondary">
-                Available lots: {taskLots.get(t.id) ?? 0} / {t.quota}
+                Available lots: {taskLots.get(t.id) ?? 0} / {t.volunteer_quota}
             </Typography>
         </Box>
     ))
-    const tasks = campaign?.task.map((t) => (
+    const tasks = campaign?.task?.map((t) => (
         <MenuItem value={t.id} key={t.id}>
-            {t.name} ({taskLots.get(t.id) ?? 0} lots available)
+            {t.task_name} ({taskLots.get(t.id) ?? 0} slots available)
         </MenuItem>
     ))
 
-    const handleChange = (event: SelectChangeEvent) => {
-        setTask(event.target.value as string);
-        setError(false); // clear error on change
+    const handleChange = (event: SelectChangeEvent<number | ''>) => {
+        setTask(event.target.value as number);
+        setError(false);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!task) {
             setError(true);
             return;
         }
         const application: ApplicationDraft = {
-            c_task_id: task,
-            user_id: user?.id ?? ''
+            campaign_task_id: task,
+            volunteer_id: user?.id ?? 0
         }
-        console.log(application);
-        setNotification({ open: true, message: "Application submitted successfully!", severity: "success" });
-        // TODO: CREATE A NEW ENTRY IN APPLICATIONS TABLE
+        
+        try {
+            await createApplication(application);
+            setNotification({ open: true, message: "Application submitted successfully!", severity: "success" });
+            setTask('');
+            
+            if (campaign?.task) {
+                const lotsMap = new Map<number, number>();
+                for (const t of campaign.task) {
+                    const lots = await getAvailableLotsForTask(t.id);
+                    lotsMap.set(t.id, lots);
+                }
+                setTaskLots(lotsMap);
+            }
+        } catch (error) {
+            console.error("Error creating application:", error);
+            setNotification({ open: true, message: "Failed to submit application. Please try again.", severity: "error" });
+        }
     };
 
 
@@ -90,25 +107,13 @@ function CampaignInfo () {
             gap: 2
         }}>
             <Typography variant={'h3'}>
-                {campaign?.name}
+                {campaign?.title}
             </Typography>
             <Box sx={{
                 display: "flex",
                 flexDirection: "column",
                 gap: 1
             }}>
-                <Typography variant={'body1'}>
-                    <CorporateFareOutlined />
-                    {campaign?.organization_name}
-                </Typography>
-                <Typography variant={'body1'}>
-                    <LocationOnOutlined />
-                    {campaign?.location}
-                </Typography>
-                <Typography variant={'body1'}>
-                    <CalendarTodayOutlined />
-                    {campaign?.date.toLocaleDateString()}
-                </Typography>
                 <Typography variant={'body1'}
                             sx={{
                                 textAlign: "justify",
@@ -123,7 +128,7 @@ function CampaignInfo () {
                 flexDirection: "column",
                 gap: 2
             }}>
-                { (!tasks_description)
+                { (!campaign?.task || campaign.task.length === 0)
                     ? <></>
                     : <>
                         <Typography variant={'h4'}>Available Volunteer Tasks</Typography>
@@ -144,6 +149,7 @@ function CampaignInfo () {
                                 <InputLabel id="task-label">Task</InputLabel>
                                 <Select
                                     labelId="task-label"
+                                    id="task-select"
                                     name="select"
                                     value={task}
                                     onChange={handleChange}
@@ -151,11 +157,10 @@ function CampaignInfo () {
                                 >
                                     {tasks}
                                 </Select>
+                                {error && (
+                                    <FormHelperText>Please select a task before applying.</FormHelperText>
+                                )}
                             </FormControl>
-
-                            {error && (
-                                <FormHelperText error>Please select a task before applying.</FormHelperText>
-                            )}
 
                             <Button onClick={handleSubmit}>
                                 Apply Now

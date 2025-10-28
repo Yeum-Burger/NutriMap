@@ -13,7 +13,7 @@ function A_OrganizationInfo () {
     useEffect(() => {
         async function get_campaign() {
             try {
-                const response = await getUserByID(id)
+                const response = await getUserByID(id ? parseInt(id) : undefined)
                 setOrganization(response.data)
             } catch (error) {
                 console.log(error)

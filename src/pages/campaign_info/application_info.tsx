@@ -1,14 +1,13 @@
-import {CalendarTodayOutlined, CorporateFareOutlined, LocationOnOutlined, WorkOutlineOutlined} from "@mui/icons-material";
+import {WorkOutlineOutlined} from "@mui/icons-material";
 import {Box, Typography} from "@mui/material"
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import type {Application, Campaign, CampaignTask} from "../../interfaces/interfaces.ts";
+import type {Campaign, CampaignTask} from "../../interfaces/interfaces.ts";
 import {getCampaignByID} from "../../services/campaign_service.ts";
 import {getApplicationByID, getTaskByID} from "../../services/volunteer_application_service.ts";
 
 function ApplicationInfo() {
     const {id} = useParams<{ id: string }>();
-    const [application, setApplication] = useState<Application | null>(null)
     const [task, setTask] = useState<CampaignTask | null>(null)
     const [campaign, setCampaign] = useState<Campaign | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
@@ -18,10 +17,10 @@ function ApplicationInfo() {
     useEffect(() => {
         async function get_application_details() {
             try {
-                const _application = await getApplicationByID(id);
-                setApplication(_application.data);
+                const applicationId = id ? parseInt(id) : undefined
+                const _application = await getApplicationByID(applicationId);
 
-                const _task = await getTaskByID(_application.data.c_task_id);
+                const _task = await getTaskByID(_application.data.campaign_task_id);
                 setTask(_task.data);
 
                 const _campaign = await getCampaignByID(_task.data.campaign_id);
@@ -50,25 +49,13 @@ function ApplicationInfo() {
             gap: 2
         }}>
             <Typography variant={'h3'}>
-                {campaign?.name}
+                {campaign?.title}
             </Typography>
             <Box sx={{
                 display: "flex",
                     flexDirection: "column",
                     gap: 1
             }}>
-                <Typography variant={'body1'}>
-                    <CorporateFareOutlined />
-                    {campaign?.organization_name}
-                </Typography>
-                <Typography variant={'body1'}>
-                    <LocationOnOutlined />
-                    {campaign?.location}
-                </Typography>
-                <Typography variant={'body1'}>
-                    <CalendarTodayOutlined />
-                    {campaign?.date.toLocaleDateString()}
-                </Typography>
                 <Typography variant={'body1'}
                 sx={{
                     textAlign: "justify",
@@ -78,10 +65,10 @@ function ApplicationInfo() {
                 </Typography>
                 <Typography variant={'body1'}>
                     <WorkOutlineOutlined />
-                    {task?.name}
+                    {task?.task_name}
                 </Typography>
                 <Typography variant={'body1'}>
-                    - {task?.description}
+                    - {task?.task_description}
                 </Typography>
             </Box>
         </Box>

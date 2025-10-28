@@ -7,7 +7,7 @@ import {getCampaignIDs} from "../../services/campaign_service.ts";
 
 function LatestCampaigns() {
     const is_mobile = useContext(mobile_context)
-    const [ids, setIds] = useState<string[] | null>(null)
+    const [ids, setIds] = useState<number[] | null>(null)
 
     useEffect(() => {
         async function get_campaign_ids() {
@@ -16,6 +16,7 @@ function LatestCampaigns() {
                 setIds(response.data.slice(0, 3))
             } catch (error) {
                 console.log(error)
+                setIds([])
             }
         }
         get_campaign_ids()
@@ -23,6 +24,22 @@ function LatestCampaigns() {
 
     // ARRAY OF CAMPAIGN CARDS
     if (!ids) return null
+    
+    if (ids.length === 0) {
+        return (
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                p: 2
+            }}>
+                <Typography variant={'h3'}>Latest Campaigns</Typography>
+                <Typography variant={'body1'}>No campaigns available at the moment.</Typography>
+            </Box>
+        )
+    }
+    
     const campaigns = ids.map((id) => (
         <Box key={id} sx={{ flex: '1 1 0', minWidth: 0, display: 'flex' }}>
             <CampaignCard id={id} hide_button={true} />

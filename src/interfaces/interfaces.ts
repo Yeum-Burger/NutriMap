@@ -1,74 +1,102 @@
 export interface User {
-    id: string;
+    id: number;
     email: string,
-    password: string,
 }
-export interface Volunteer extends User {
-    first_name: string,
-    last_name: string,
+export interface Volunteer {
+    id: number;
+    created_at?: string;
+    f_name: string;
+    email: string;
+    l_name: string;
 }
-export interface Organization extends User {
-    organization_name: string,
-    address: string,
+export interface Organization {
+    id: number;
+    created_at?: string;
+    name: string;
+    type?: number;
+    contact_person?: string;
+    email: string;
+    contact_person_info?: string;
+    address: string;
+    organization_name?: string;
 }
 export interface Campaign {
-    id: string,
-    name: string,
-    organization_name: string,
-    organization_id: string,
-    location: string,
-    date: Date,
-    description: string,
-    task: CampaignTask[],
+    id: number;
+    created_at: string;
+    title: string;
+    description: string;
+    organization_id: number;
+    name?: string;
+    organization_name?: string;
+    location?: string;
+    date?: Date;
+    task?: CampaignTask[];
 }
 export interface CampaignTask {
-    id: string,
-    campaign_id: string,
-    quota: string,
-    name: string,
-    description: string,
+    id: number;
+    created_at: string;
+    campaign_id: number;
+    task_name: string;
+    task_description: string;
+    start_date: string;
+    volunteer_quota: number;
+    name?: string;
+    description?: string;
+    quota?: number;
 }
 export interface Application {
-    id: string,
-    c_task_id: string,
-    user_id: string,
+    id: number;
+    created_at: string;
+    campaign_task_id: number;
+    volunteer_id: number;
 }
 export interface LogInFormData {
     email: string;
-    password: string;
 }
 export interface JoinVolunteerFormData {
     f_name: string,
     l_name: string,
     email: string,
-    password: string,
-    c_password: string,
 }
 export interface JoinOrganizationFormData {
     organization_name: string,
     address: string,
     email: string,
-    password: string,
-    c_password: string,
 }
 export interface CreateCampaignFormData {
-    name: string,
-    location: string,
-    date: Date,
-    description: string,
-    task: TaskDraft[],
+    title: string;
+    description: string;
+    organization_id: number;
+    task: TaskDraft[];
 }
 export interface TaskDraft {
-    name: string;
-    description: string;
-    quota: string;
+    task_name: string;
+    task_description: string;
+    volunteer_quota: number;
+    start_date: string;
 }
 export interface ApplicationDraft {
-    c_task_id: string,
-    user_id: string,
+    campaign_task_id: number;
+    volunteer_id: number;
+}
+export interface Barangay {
+    id: number;
+    created_at: string;
+    name: string;
+    malnourished_count: number;
+    severity: number;
+    risk_score: number;
+    last_updated_date: string;
+}
+export interface BarangayData {
+    id: number;
+    created_at: string;
+    date_collected: string;
+    barangay_id: number;
+    malnourished_count: number;
 }
 export interface BarangayRiskData {
-    id: string;
+    id: number;
     name: string;
     risk_score: number;
     severity: 'HIGH' | 'MEDIUM' | 'LOW';

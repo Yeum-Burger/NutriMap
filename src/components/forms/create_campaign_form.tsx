@@ -10,11 +10,11 @@ import {
 import type { CreateCampaignFormData, TaskDraft } from "../../interfaces/interfaces.ts";
 import {mobile_context} from "../../mobile_context";
 import Notification from "../notification.tsx";
+import { createCampaign } from "../../services/campaign_service.ts";
+import { useAuth } from "../../services/auth_service.tsx";
 
 interface FormErrors {
-    name?: string;
-    location?: string;
-    date?: string;
+    title?: string;
     description?: string;
     task?: string;
     task_quota?: string;
@@ -23,12 +23,12 @@ interface FormErrors {
 
 function CreateCampaignForm() {
     const is_mobile = useContext(mobile_context)
+    const { user } = useAuth()
     const [notification, setNotification] = useState({ open: false, message: "", severity: "success" as "success" | "error" });
     const [form_data, setFormData] = useState<CreateCampaignFormData>({
-        name: "",
-        location: "",
-        date: new Date(),
+        title: "",
         description: "",
+        organization_id: user?.id ?? 0,
         task: [],
     });
 
@@ -42,7 +42,7 @@ function CreateCampaignForm() {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: name === "date" ? new Date(value) : value,
+            [name]: value,
         }));
     };
 
@@ -60,9 +60,10 @@ function CreateCampaignForm() {
         }
 
         const newTask: TaskDraft = {
-            name: trimmedName,
-            quota: trimmedQuota,
-            description: trimmedDescription,
+            task_name: trimmedName,
+            volunteer_quota: parseInt(trimmedQuota),
+            task_description: trimmedDescription,
+            start_date: new Date().toISOString(),
         };
 
         setFormData(prev => ({
@@ -86,17 +87,14 @@ function CreateCampaignForm() {
     const handleDeleteTask = (taskToDelete: TaskDraft) => {
         setFormData(prev => ({
             ...prev,
-            task: prev.task.filter(task => task.name !== taskToDelete.name),
+            task: prev.task.filter(task => task.task_name !== taskToDelete.task_name),
         }));
     };
 
     const handle_submit = async () => {
         const newErrors: FormErrors = {};
 
-        if (!form_data.name.trim()) newErrors.name = "This field is required";
-        if (!form_data.location.trim()) newErrors.location = "This field is required";
-        if (!form_data.date || isNaN(form_data.date.getTime()))
-            newErrors.date = "This field is required";
+        if (!form_data.title.trim()) newErrors.title = "This field is required";
         if (!form_data.description.trim()) newErrors.description = "This field is required";
 
         if (taskInputEnabled && form_data.task.length === 0) {
@@ -106,9 +104,24 @@ function CreateCampaignForm() {
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
 
-        console.log("Form submitted:", form_data);
-        setNotification({ open: true, message: "Campaign submitted for proposal!", severity: "success" });
-        // TODO: pass form_data to campaign creation service
+        try {
+            const campaignDataToSubmit = {
+                ...form_data,
+                organization_id: user?.id ?? 0
+            };
+            await createCampaign(campaignDataToSubmit);
+            setNotification({ open: true, message: "Campaign submitted for proposal!", severity: "success" });
+            setFormData({
+                title: "",
+                description: "",
+                organization_id: user?.id ?? 0,
+                task: [],
+            });
+            setTaskInputEnabled(false);
+        } catch (error) {
+            console.error("Error creating campaign:", error);
+            setNotification({ open: true, message: "Failed to create campaign. Please try again.", severity: "error" });
+        }
     };
 
     return (
@@ -130,30 +143,12 @@ function CreateCampaignForm() {
                     gap: 2
                 }}>
                     <TextField
-                        name="name"
-                        label="Campaign Name"
-                        value={form_data.name}
+                        name="title"
+                        label="Campaign Title"
+                        value={form_data.title}
                         onChange={handle_change}
-                        error={!!errors.name}
-                        helperText={errors.name}
-                    />
-                    <TextField
-                        name="location"
-                        label="Location"
-                        value={form_data.location}
-                        onChange={handle_change}
-                        error={!!errors.location}
-                        helperText={errors.location}
-                    />
-                    <TextField
-                        name="date"
-                        label="Date"
-                        type="date"
-                        value={form_data.date.toISOString().split("T")[0]}
-                        onChange={handle_change}
-                        error={!!errors.date}
-                        helperText={errors.date}
-                        InputLabelProps={{ shrink: true }}
+                        error={!!errors.title}
+                        helperText={errors.title}
                     />
                     <TextField
                         name="description"
@@ -240,7 +235,7 @@ function CreateCampaignForm() {
                         {form_data.task.map((task, index) => (
                             <Chip
                                 key={index}
-                                label={`${task.name} (${task.quota})`}
+                                label={`${task.task_name} (${task.volunteer_quota})`}
                                 onDelete={() => handleDeleteTask(task)}
                                 color="primary"
                             />
