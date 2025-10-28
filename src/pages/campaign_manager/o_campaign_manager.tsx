@@ -1,4 +1,4 @@
-import {Box, List} from "@mui/material"
+import {Typography, Box, List} from "@mui/material"
 import {useEffect, useState} from "react";
 import CampaignCard from "../../components/campaign_card.tsx";
 import {useAuth} from "../../services/auth_service.tsx";
